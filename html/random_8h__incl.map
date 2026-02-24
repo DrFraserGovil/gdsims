@@ -1,9 +1,0 @@
-<map id="random.h" name="random.h">
-<area shape="rect" id="Node000001" title=" " alt="" coords="73,5,148,32"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,80,61,107"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="99,34,59,71,56,67,95,31"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="85,80,136,107"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="113,33,113,64,108,64,108,33"/>
-<area shape="rect" id="Node000004" href="$constants_8h.html" title=" " alt="" coords="159,80,248,107"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="128,30,177,68,174,73,125,35"/>
-</map>

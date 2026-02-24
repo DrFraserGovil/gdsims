@@ -1,7 +1,0 @@
-<map id="Dispersal::M_dispersing_out" name="Dispersal::M_dispersing_out">
-<area shape="rect" id="Node000001" title=" " alt="" coords="217,47,402,73"/>
-<area shape="rect" id="Node000002" href="$class_distance_kernel_dispersal.html#a8f42419dd4e180ed62680ffab734c677" title=" " alt="" coords="5,5,169,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="201,46,169,42,169,36,201,41"/>
-<area shape="rect" id="Node000003" href="$class_radial_dispersal.html#aa3bca3cc8b2d80af4bd11d91cacf09bb" title=" " alt="" coords="10,72,164,115"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="202,79,165,84,164,79,201,74"/>
-</map>

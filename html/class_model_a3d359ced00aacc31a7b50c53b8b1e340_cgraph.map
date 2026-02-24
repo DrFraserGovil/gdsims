@@ -1,9 +1,0 @@
-<map id="Model::initiate" name="Model::initiate">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,56,108,83"/>
-<area shape="rect" id="Node000002" href="$class_model.html#add15fa39b2e8fda3fefc551de4d0e1bb" title=" " alt="" coords="162,5,311,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="106,53,171,34,173,39,107,58"/>
-<area shape="rect" id="Node000003" href="$class_dispersal.html#aef84d06c465ccb461d1cfb39e82de838" title=" " alt="" coords="158,56,315,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="108,67,142,67,142,72,108,72"/>
-<area shape="rect" id="Node000004" href="$class_model.html#a1b78097ea008a3b4cc36b321c7d42289" title=" " alt="" coords="156,107,317,149"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="101,81,155,99,154,104,99,86"/>
-</map>

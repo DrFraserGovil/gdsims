@@ -1,7 +1,0 @@
-<map id="DistanceKernelDispersal" name="DistanceKernelDispersal">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,449,179,583"/>
-<area shape="rect" id="Node000002" href="$class_dispersal.html" title=" " alt="" coords="25,160,159,400"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="95,415,95,450,89,450,89,415"/>
-<area shape="rect" id="Node000003" href="$class_boundary_strategy.html" title=" " alt="" coords="24,5,160,96"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="95,96,95,143,89,143,89,96"/>
-</map>

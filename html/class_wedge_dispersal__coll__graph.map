@@ -1,7 +1,0 @@
-<map id="WedgeDispersal" name="WedgeDispersal">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,449,172,668"/>
-<area shape="rect" id="Node000002" href="$class_dispersal.html" title=" " alt="" coords="22,160,155,400"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="91,415,91,450,86,450,86,415"/>
-<area shape="rect" id="Node000003" href="$class_boundary_strategy.html" title=" " alt="" coords="21,5,157,96"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="91,96,91,143,86,143,86,96"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="Patch::update_comp" name="Patch::update_comp">
-<area shape="rect" id="Node000001" title=" " alt="" coords="177,56,318,83"/>
-<area shape="rect" id="Node000002" href="$class_patch.html#a935e1a959a81d818c161b1182a45e958" title=" " alt="" coords="5,5,129,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="182,54,116,35,118,30,183,49"/>
-<area shape="rect" id="Node000003" href="$class_patch.html#a0b87a603b96a7abeead815a78d8501c6" title=" " alt="" coords="9,56,125,83"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="161,72,125,72,125,67,161,67"/>
-<area shape="rect" id="Node000004" href="$class_patch.html#ada58f98a20b459b05e7d4b986de3aeee" title=" " alt="" coords="11,107,123,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="183,90,118,109,116,104,182,85"/>
-</map>

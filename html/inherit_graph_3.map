@@ -1,7 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$class_boundary_strategy.html" title=" " alt="" coords="5,31,131,57"/>
-<area shape="rect" id="Node000001" href="$class_edge_boundary_strategy.html" title=" " alt="" coords="186,5,342,32"/>
-<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="146,31,185,26,186,31,146,37"/>
-<area shape="rect" id="Node000002" href="$class_toroidal_boundary_strategy.html" title=" " alt="" coords="179,56,349,83"/>
-<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="146,51,179,56,178,61,146,57"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Patch::Patch" name="Patch::Patch">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,103,32"/>
-<area shape="rect" id="Node000002" href="$random_8cpp.html#a108ff3fb960f77177389a96a01ed1c74" title=" " alt="" coords="151,5,243,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="103,16,135,16,135,21,103,21"/>
-<area shape="rect" id="Node000003" href="$random_8cpp.html#af3edb3b1a762ddbe5539bc80ef5e023c" title=" " alt="" coords="291,5,350,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="244,16,276,16,276,21,244,21"/>
-</map>

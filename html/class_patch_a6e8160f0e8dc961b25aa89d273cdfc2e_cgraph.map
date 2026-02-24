@@ -1,7 +1,0 @@
-<map id="Patch::M_disperse_in" name="Patch::M_disperse_in">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,153,32"/>
-<area shape="rect" id="Node000002" href="$class_patch.html#a14846b95a2c4032ae4de370abc5ddb04" title=" " alt="" coords="201,5,339,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="153,16,185,16,185,21,153,21"/>
-<area shape="rect" id="Node000003" href="$class_patch.html#adf7fcfe3a5b2b00afe76c9dac3aea50c" title=" " alt="" coords="387,5,542,32"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,16,372,16,372,21,339,21"/>
-</map>
