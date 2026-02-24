@@ -1,8 +1,0 @@
-Adult female populations of each genotype at each site
-Day	Site	WW	WD	DD	WR	RR	DR
-0	1	33456	0	0	0	0	0
-200	1	32907	0	0	0	0	0
-400	1	20136	10753	1587	314	3	100
-600	1	4	364	5601	8	7	374
-800	1	0	0	0	0	0	0
-1000	1	0	0	0	0	0	0

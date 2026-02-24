@@ -1,4 +1,0 @@
-Total adult females of each genotype
-Day	WW	WD	DD	WR	RR	DR
-0	1549191	0	0	0	0	0
-1	1549464	0	0	0	0	0
