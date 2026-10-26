@@ -1,3 +1,7 @@
 gdsims
-*build
-*build-ship
+gdsims_debug
+gdsims_profile
+.build/
+.build-*/
+tests/gdsims_tests
+output_files

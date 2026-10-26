@@ -4,8 +4,9 @@ project(gdsims VERSION 0.1.0 LANGUAGES C CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
-  
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "$<1:${CMAKE_CURRENT_SOURCE_DIR}>") # $<1:...> stops VS/Xcode adding a Release/ subfolder
+set(CMAKE_CXX_EXTENSIONS OFF)
+ 
 ## cmake libraries
 include (FetchContent) # Needed for JSL and Catch2 
 
@@ -26,7 +27,27 @@ else()
 	FetchContent_MakeAvailable(JSL)
 endif()
 
+### SET COMPILER OPTIMS & WARNINGS
+	## An empty 'library' that duplicates warnings & compiler optimisations
+	add_library(gdsims_warnings INTERFACE)
+	if(MSVC)
+		target_compile_options(gdsims_warnings INTERFACE /W4)
+	else()
+		target_compile_options(gdsims_warnings INTERFACE -Wall -Wextra -Wpedantic)
+	endif()
 
+	## Debug-only extras: bounds-checked STL and sanitizers (GCC/Clang only)
+	option(GDSIMS_SANITIZE "Enable AddressSanitizer + UBSan in Debug builds" ON)
+	if(NOT MSVC)
+		target_compile_options(gdsims_warnings INTERFACE $<$<CONFIG:Debug>:-D_GLIBCXX_ASSERTIONS>)
+		if(GDSIMS_SANITIZE)
+			target_compile_options(gdsims_warnings INTERFACE "$<$<CONFIG:Debug>:-fsanitize=address,undefined;-fno-omit-frame-pointer>")
+			target_link_options(gdsims_warnings INTERFACE "$<$<CONFIG:Debug>:-fsanitize=address,undefined>")
+		endif()
+
+		## Profile builds: keep frame pointers so `perf record -g` gives reliable call stacks
+		target_compile_options(gdsims_warnings INTERFACE $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>)
+	endif()
 
 ### COMPILE THE LIBRARY (Everything except main.cpp)
 	file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
@@ -34,13 +55,21 @@ endif()
 
 	add_library(gdsimslib STATIC ${LIB_SOURCES})
 	target_link_libraries(gdsimslib PUBLIC JSL)
+	target_link_libraries(gdsimslib PRIVATE gdsims_warnings)
 	target_include_directories(gdsimslib PUBLIC includes)
 
 ### COMPILE THE EXECUTABLE
 	add_executable(gdsims src/main.cpp)
 	target_link_libraries(gdsims PUBLIC gdsimslib)
+	target_link_libraries(gdsims PRIVATE gdsims_warnings)
+	# so debug/profile builds don't overwrite ./gdsims
+	set_target_properties(gdsims PROPERTIES DEBUG_POSTFIX "_debug" RELWITHDEBINFO_POSTFIX "_profile")
+
+### UNIT TESTS (Catch2)
+	option(GDSIMS_BUILD_TESTS "Build the Catch2 unit test suite" OFF)
+	if(GDSIMS_BUILD_TESTS)
+		enable_testing()
+		add_subdirectory(tests)
+	endif()
 
 
-# set(CPACK_PROJECT_NAME ${PROJECT_NAME})
-# set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
-# include(CPack)
