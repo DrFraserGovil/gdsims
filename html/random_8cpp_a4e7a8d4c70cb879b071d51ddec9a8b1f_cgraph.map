@@ -1,8 +1,0 @@
-<map id="random_binomial" name="random_binomial">
-<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,125,57"/>
-<area shape="rect" id="Node000002" href="$random_8cpp.html#a2b4b3dc20892808a0220d878773ba864" title=" " alt="" coords="173,5,289,32"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="125,32,157,27,158,33,126,37"/>
-<area shape="rect" id="Node000003" href="$random_8cpp.html#af3edb3b1a762ddbe5539bc80ef5e023c" title=" " alt="" coords="337,31,396,57"/>
-<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="125,41,321,41,321,47,125,47"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="290,27,322,33,321,38,289,32"/>
-</map>

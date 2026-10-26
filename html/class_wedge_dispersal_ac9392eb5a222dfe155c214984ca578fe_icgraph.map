@@ -1,7 +1,0 @@
-<map id="WedgeDispersal::compute_distances" name="WedgeDispersal::compute_distances">
-<area shape="rect" id="Node000001" title=" " alt="" coords="418,5,592,48"/>
-<area shape="rect" id="Node000002" href="$class_wedge_dispersal.html#aa4956f7838e14b9ef2c34b3daada31fc" title=" " alt="" coords="196,5,370,48"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="403,29,370,29,370,24,403,24"/>
-<area shape="rect" id="Node000003" href="$class_wedge_dispersal.html#a20c41680375fb8605d977976bd9caaca" title=" " alt="" coords="5,5,148,48"/>
-<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="180,29,148,29,148,24,180,24"/>
-</map>

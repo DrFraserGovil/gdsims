@@ -1,8 +1,0 @@
-Adult female populations of each genotype at each site
-Day	Site	WW	WD	DD	WR	RR	DR
-0	1	0	0	0	0	0	0
-200	1	0	0	0	0	0	0
-400	1	0	0	0	0	0	0
-600	1	0	0	0	0	0	0
-800	1	0	0	0	0	0	0
-1000	1	0	0	0	0	0	0
