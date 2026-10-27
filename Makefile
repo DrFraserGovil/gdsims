@@ -32,7 +32,7 @@ test:
 	@ctest --test-dir $(BUILD_DIR)-test -C Debug --output-on-failure
 
 mirror:
-	@command -v lsj>/dev/null 2>&1 && lsj src/Settings/*.h $(MIRROR_FLAGS) || echo "no mirror found, using cached values"
+	@command -v lsj>/dev/null 2>&1 && lsj src $(MIRROR_FLAGS) || echo "no mirror found, using cached values"
 
 purge:
 	@echo "Removing all build files"

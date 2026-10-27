@@ -51,15 +51,16 @@ endif()
 
 ### COMPILE THE LIBRARY (Everything except main.cpp)
 	file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
-	list(REMOVE_ITEM LIB_SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp")
+	list(FILTER LIB_SOURCES EXCLUDE REGEX "/src/app/")        # all of app/ stays out of the library
 
 	add_library(gdsimslib STATIC ${LIB_SOURCES})
 	target_link_libraries(gdsimslib PUBLIC JSL)
 	target_link_libraries(gdsimslib PRIVATE gdsims_warnings)
-	target_include_directories(gdsimslib PUBLIC includes)
+	target_include_directories(gdsimslib PUBLIC src)
 
 ### COMPILE THE EXECUTABLE
-	add_executable(gdsims src/main.cpp)
+	file(GLOB APP_SOURCES CONFIGURE_DEPENDS "src/app/*.cpp")
+	add_executable(gdsims ${APP_SOURCES})
 	target_link_libraries(gdsims PUBLIC gdsimslib)
 	target_link_libraries(gdsims PRIVATE gdsims_warnings)
 	# so debug/profile builds don't overwrite ./gdsims

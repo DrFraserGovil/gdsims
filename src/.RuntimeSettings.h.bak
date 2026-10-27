@@ -1,0 +1,9 @@
+#pragma once
+#include <JSL/Interface.h>
+class RuntimeSettings : public JSL::Interface::Aggregator<RuntimeSettings>
+{
+  public:
+	bool Quiet;
+};
+
+extern RuntimeSettings Runtime;

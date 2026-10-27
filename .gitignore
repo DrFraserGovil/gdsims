@@ -5,3 +5,4 @@ gdsims_profile
 .build-*/
 tests/gdsims_tests
 output_files
+.jvim.session
