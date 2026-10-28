@@ -1,5 +1,10 @@
 cmake_minimum_required(VERSION 3.15.0)
-project(gdsims VERSION 0.1.0 LANGUAGES C CXX)
+
+## The version number lives in VERSION (single source of truth); editing it triggers a reconfigure
+file(STRINGS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION" GDSIMS_VERSION LIMIT_COUNT 1)
+string(STRIP "${GDSIMS_VERSION}" GDSIMS_VERSION)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/VERSION")
+project(gdsims VERSION ${GDSIMS_VERSION} LANGUAGES C CXX)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -57,6 +62,10 @@ endif()
 	target_link_libraries(gdsimslib PUBLIC JSL)
 	target_link_libraries(gdsimslib PRIVATE gdsims_warnings)
 	target_include_directories(gdsimslib PUBLIC src)
+
+	## version.h is generated into the build dir, so `#include "version.h"` works from anywhere
+	configure_file(src/version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/version.h" @ONLY)
+	target_include_directories(gdsimslib PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/generated")
 
 ### COMPILE THE EXECUTABLE
 	file(GLOB APP_SOURCES CONFIGURE_DEPENDS "src/app/*.cpp")

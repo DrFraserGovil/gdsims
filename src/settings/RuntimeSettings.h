@@ -1,6 +1,7 @@
 //! LSJ target
 #pragma once
 #include <JSL/Interface.h>
+
 class RuntimeSettings : public JSL::Interface::Aggregator<RuntimeSettings>
 {
   public:
@@ -20,8 +21,7 @@ class RuntimeSettings : public JSL::Interface::Aggregator<RuntimeSettings>
 	//! @brief The number of threads to run the simulation suite on.
 	size_t ParallelThreads = 1;
 
-	//! @alias i, interface, interactive
-	//! @brief Activates the interactive menu option for configuring runs
+	//! @brief Non-configurable. Set to true by the parser when the "interactive" command is given
 	bool Interactive = false;
 
 #include "RuntimeSettings.RuntimeSettings.autogen"

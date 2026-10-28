@@ -7,6 +7,9 @@ template<typename Wrapper>
 void FieldList([[maybe_unused]] Wrapper &&W)
 {
 	Name = "MainSettings";
+	HelpData.Commands["interactive"] = "Activates interactive mode allowing for user input on the configuration";
+	HelpData.Commands["run"] = "Run a full GDSiMS suite using the generated model parameters";
+	HelpData.Commands["version"] = "Activates the version display, then exits";
 	W(Runtime);
 	W(Simulation);
 }

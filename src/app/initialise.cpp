@@ -1,54 +1,69 @@
 #include "initialise.h"
 #include "settings/MainSettings.h"
+#include "settings/derive.h"
 #include "settings/validate.h"
 #include <JSL/Log.h>
+#include <JSL/Strings.h>
 
 namespace
 {
-	void initialiseLogging()
+	bool singleCmd(const std::vector<std::string> &cmds, const std::string &target)
 	{
-		JSL::Log::Global().Level = INFO;
-		JSL::Log::Global().ShowHeaders = false;
-		JSL::Log::Global().DebugColour = JSL::Display::Colour(60, 60, 130);
-		JSL::Log::Global().AlignSize(30);
+		return cmds.size() == 1 && JSL::String::iEquals(cmds[0], target);
+	}
+	Mode parseCommands()
+	{
+		auto cmds = Settings.Commands;
+		LOG(DEBUG) << "Parsing Commands " << cmds;
 
-		if (Settings.Runtime.Verbose)
+		if (cmds.empty() || singleCmd(cmds, "run"))
 		{
-			JSL::Log::Global().Level = DEBUG;
-			JSL::Log::Global().ShowHeaders = true;
+			return Mode::Run;
 		}
-		else if (Settings.Runtime.Silent)
+
+		if (singleCmd(cmds, "interactive"))
 		{
-			JSL::Log::Global().Level = ERROR;
+			ChangeSettings().Runtime.Interactive = true;
+			return Mode::Interactive;
 		}
-		else if (Settings.Runtime.Quiet)
+		if (singleCmd(cmds, "version"))
 		{
-			JSL::Log::Global().Level = WARN;
+			return Mode::Version;
 		}
+
+		LOG(ERROR) << "Unknown or conflicting commands passed to the application\n\t" << cmds;
+		throw std::invalid_argument("Could not parse commands");
 	}
 } // namespace
 
 Mode readConfiguration(int argc, char **argv)
 {
 	ChangeSettings().Parse(argc, argv);
+	deriveSettingsValues();
 
-	initialiseLogging();
+	auto mode = parseCommands();
 
-	if (!Settings.Runtime.Interactive)
+	switch (mode)
 	{
-		validateSettings(Settings);
-		return Mode::Run;
+		case Mode::Version: {
+			break; // version doesn't validate
+		}
+		case Mode::Interactive: {
+
+			// Interactive mode allows an invalid startup, as long as nothing is fatal: the menu must refuse to launch a simulation until the errors are fixed
+			const auto status = querySettingsConstraints(Settings);
+			status.LogWarnings();
+			status.ThrowIfFatal();
+			if (!status.Valid())
+			{
+				status.LogErrors();
+				LOG(INFO) << "These must be fixed in interactive mode before a simulation can be launched";
+			}
+			break;
+		}
+		default: // anything else gets strictly checked by default
+			validateSettings(Settings);
 	}
 
-	// Interactive mode allows an invalid startup, as long as nothing is fatal: the menu must refuse to launch a simulation until the errors are fixed
-	const auto status = querySettingsConstraints(Settings);
-	status.LogWarnings();
-	status.ThrowIfFatal();
-	if (!status.Valid())
-	{
-		status.LogErrors();
-		LOG(INFO) << "These must be fixed in interactive mode before a simulation can be launched";
-	}
-
-	return Mode::Interactive;
+	return mode;
 }

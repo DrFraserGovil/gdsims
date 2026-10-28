@@ -1,4 +1,6 @@
 #include "initialise.h"
+#include "menu.h"
+#include "version.h"
 #include <JSL.h>
 int main(int argc, char **argv)
 {
@@ -11,14 +13,19 @@ int main(int argc, char **argv)
 				// TODO: launch the simulation
 				break;
 			case Mode::Interactive:
-				// TODO: launch the interactive menu
+				openMenu();
+				break;
+			case Mode::Version:
+				std::cout << version::String << "\n";
+				break;
+			default:
+				throw std::invalid_argument("Sorry, that command is not yet supoprted");
 				break;
 		}
 	}
 	catch (std::exception &e)
 	{
-		LOG(ERROR) << "FATAL ERROR: \n"
-				   << e.what();
+		std::cerr << "FATAL ERROR: " << e.what() << "\n";
 		LOG(INFO) << "GDSiMS cannot recover: exiting with code 1";
 		return 1;
 	}
