@@ -12,4 +12,4 @@ void FieldList([[maybe_unused]] Wrapper &&W)
 	W(JSL::Interface::Field<bool>(Verbose, "Verbose", {"v", "verbose"}, false, "If true, sets the logging to Loud mode (includes debug messages). Overrides Quiet and Silent modes."));
 	W(JSL::Interface::Field<size_t>(ParallelThreads, "ParallelThreads", {"thread"}, 1, "The number of threads to run the simulation suite on."));
 }
-// END AUTOGEN 
+// END AUTOGEN

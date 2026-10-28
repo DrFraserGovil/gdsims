@@ -1,6 +1,6 @@
+#include "commands.h"
 #include "initialise.h"
 #include "menu.h"
-#include "version.h"
 #include <JSL.h>
 int main(int argc, char **argv)
 {
@@ -10,13 +10,13 @@ int main(int argc, char **argv)
 		switch (mode)
 		{
 			case Mode::Run:
-				// TODO: launch the simulation
+				runSimulation();
 				break;
 			case Mode::Interactive:
 				openMenu();
 				break;
 			case Mode::Version:
-				std::cout << version::String << "\n";
+				printVersion();
 				break;
 			default:
 				throw std::invalid_argument("Sorry, that command is not yet supoprted");
