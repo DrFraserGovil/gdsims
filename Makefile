@@ -6,10 +6,10 @@ MIRROR_FLAGS ?= -vf
 MAKEFLAGS += --no-print-directory
 
 # $(call build,<build dir>,<build type>,<target>,<extra cmake flags>[,<mirror flags>])
-# Mirrors settings, configures the build dir (first time only), then builds the target.
+# Mirrors settings, configures the build dir (if it has never been configured, or a previous configure failed partway), then builds the target.
 define build
 	@$(MAKE) mirror MIRROR_FLAGS=$(or $(5),-fq)
-	@if [ ! -f "$(1)/CMakeCache.txt" ]; then \
+	@if [ ! -f "$(1)/CMakeCache.txt" ] || [ ! -f "$(1)/Makefile" ]; then \
 		cmake -S . -B $(1) -DCMAKE_BUILD_TYPE=$(2) $(4); \
 	fi
 	@cmake --build $(1) --config $(2) --target $(3) $(EXTRA_BUILD_FLAGS)

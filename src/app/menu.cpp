@@ -11,7 +11,7 @@
 #include <vector>
 
 const auto cmdCol = JSL::Display::Cyan();
-// Prompts and menu text go to std::cout, never LOG: the log level (-q / -s) could hide them
+// Prompts and output the user asked for go to std::cout, never LOG: the log level (-q / -s) could hide them. Banners and hints may use LOG (hiding them under -q is fine)
 namespace
 {
 	using Tokens = std::vector<std::string>;
@@ -72,33 +72,34 @@ namespace
 
 	void runCommand(const Tokens &tokens)
 	{
-		if (tokens.size() == 1)
-		{
-			runSimulation();
-			return;
-		}
 		if (requestsHelp(tokens))
 		{
 			ChangeSettings().Help(); // the command-line help is exactly the syntax that `run [args]` accepts
 			return;
 		}
 
-		SettingsRestorer restore;
-		applyOverrides(tokens);
-		if (Settings.Commands.size() != 1)
+		SettingsRestorer restore; // harmless when there are no overrides
+		if (tokens.size() > 1)
 		{
-			throw std::invalid_argument("run only accepts -flag arguments, but was also given other commands");
+			applyOverrides(tokens);
+			if (Settings.Commands.size() != 1)
+			{
+				throw std::invalid_argument("run only accepts -flag arguments, but was also given other commands");
+			}
 		}
-		auto status = querySettingsConstraints(Settings);
-		LOG(WARN) << "HERE";
-		if (status.Valid())
+
+		// Checked here (rather than letting runSimulation throw) so that a bad state is reported in the usual validation format, and the user stays in the menu
+		const auto status = querySettingsConstraints(Settings);
+		status.LogWarnings();
+		status.ThrowIfFatal();
+		if (!status.Valid())
 		{
-			runSimulation();
+			// A reminder rather than a log entry: one message, in the error colour, without LOG's headers
+			std::cerr << JSL::Log::Global().ErrorColour << "Simulation not launched; the settings still need fixing:\n\t"
+					  << JSL::String::stitch(status.Errors, "\n\t") << JSL::Display::ResetAll() << "\n";
+			return;
 		}
-		else
-		{
-			LOG(ERROR) << "Could not launch simulation; Settings are in an invalid state:\n\t" << JSL::String::stitch(status.Errors, "\n\t");
-		}
+		runSimulation();
 	}
 
 	void settingsMenu()
@@ -111,7 +112,7 @@ namespace
 
 		if (!status.Valid())
 		{
-			LOG(WARN) << "The settings are an invalid state: a simulation will refuse to launch until this is rectified";
+			LOG(WARN) << "The settings are in an invalid state: a simulation will refuse to launch until this is rectified";
 		}
 		status.LogWarnings();
 		status.LogErrors();
