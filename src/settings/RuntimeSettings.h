@@ -4,12 +4,16 @@
 class RuntimeSettings : public JSL::Interface::Aggregator<RuntimeSettings>
 {
   public:
-	//! @alias q
+	//! @alias s, silent
+	//! @brief If true, sets the logging to Silent mode (only errors). Overrides Quiet mode.
+	bool Silent = false;
+
+	//! @alias q, quiet
 	//! @brief If true, sets the logging to Quiet mode (only warnings and errors)
 	bool Quiet = false;
 
 	//! @alias v, verbose
-	//! @brief If true, sets the logging to Loud mode (includes debug messages). Overrides Quiet mode.
+	//! @brief If true, sets the logging to Loud mode (includes debug messages). Overrides Quiet and Silent modes.
 	bool Verbose = false;
 
 	//! @alias thread

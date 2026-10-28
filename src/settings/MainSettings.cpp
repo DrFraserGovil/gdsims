@@ -4,13 +4,13 @@
 
 namespace // This ensures that the underlying object *only* exists within this translation unit
 {
-	SettingObject internalSettings;
+	MainSettings internalSettings;
 } // namespace
 
 // The 'settings' is actually the object named above; everyone else is only touching a reference to it
-const SettingObject &Settings = internalSettings;
+const MainSettings &Settings = internalSettings;
 
-SettingObject &ChangeSettings()
+MainSettings &ChangeSettings()
 {
 	return internalSettings;
 }

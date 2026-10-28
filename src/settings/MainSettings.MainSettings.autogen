@@ -6,7 +6,8 @@ public:
 template<typename Wrapper>
 void FieldList([[maybe_unused]] Wrapper &&W)
 {
-	Name = "SettingObject";
+	Name = "MainSettings";
 	W(Runtime);
 	W(Simulation);
 }
+// END AUTOGEN 

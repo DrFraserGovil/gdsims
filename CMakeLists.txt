@@ -49,7 +49,7 @@ endif()
 		target_compile_options(gdsims_warnings INTERFACE $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>)
 	endif()
 
-### COMPILE THE LIBRARY (Everything except main.cpp)
+### COMPILE THE LIBRARY (Everything except src/app)
 	file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 	list(FILTER LIB_SOURCES EXCLUDE REGEX "/src/app/")        # all of app/ stays out of the library
 

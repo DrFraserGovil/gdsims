@@ -7,8 +7,10 @@ template<typename Wrapper>
 void FieldList([[maybe_unused]] Wrapper &&W)
 {
 	Name = "RuntimeSettings";
-	W(JSL::Interface::Field<bool>(Quiet, "Quiet", {"q"}, false, "If true, sets the logging to Quiet mode (only warnings and errors)"));
-	W(JSL::Interface::Field<bool>(Verbose, "Verbose", {"v", "verbose"}, false, "If true, sets the logging to Loud mode (includes debug messages). Overrides Quiet mode."));
+	W(JSL::Interface::Field<bool>(Silent, "Silent", {"s", "silent"}, false, "If true, sets the logging to Silent mode (only errors). Overrides Quiet mode."));
+	W(JSL::Interface::Field<bool>(Quiet, "Quiet", {"q", "quiet"}, false, "If true, sets the logging to Quiet mode (only warnings and errors)"));
+	W(JSL::Interface::Field<bool>(Verbose, "Verbose", {"v", "verbose"}, false, "If true, sets the logging to Loud mode (includes debug messages). Overrides Quiet and Silent modes."));
 	W(JSL::Interface::Field<size_t>(ParallelThreads, "ParallelThreads", {"thread"}, 1, "The number of threads to run the simulation suite on."));
 	W(JSL::Interface::Field<bool>(Interactive, "Interactive", {"i", "interactive", "interface"}, false, "Activates the interactive menu option for configuring runs"));
 }
+// END AUTOGEN 
