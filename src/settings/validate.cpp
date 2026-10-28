@@ -1,14 +1,16 @@
 #include "validate.h"
 #include "validationHelpers.h"
 #include <JSL.h>
+#include <stdexcept>
 #include <thread>
-using validation::QueuedMsg;
+using validation::Recorder;
 
-// Each section gets its own validateX function; add a call to it in validateSettings at the bottom.
+// Each section gets its own validateX function; add a call to it in querySettingsConstraints below.
 // For checks that depend on another section, pass the whole MainSettings instead of just the sub-struct.
+// Severity: FatalIf if the program can't run at all, FailIf if the user could fix it from the interactive menu, WarnIf otherwise.
 namespace
 {
-	void validateRuntime(const RuntimeSettings &s, validation::Recorder &record)
+	void validateRuntime(const RuntimeSettings &s, Recorder &record)
 	{
 		// ---------- PARALLEL ---------
 		const size_t hw = std::thread::hardware_concurrency();
@@ -24,29 +26,68 @@ namespace
 		record.WarnIf(s.Quiet + s.Silent + s.Verbose > 1, "More than one of Quiet/Silent/Verbose is set; Verbose takes precedence");
 
 		// ---------- INTERACTIVITY ---------
-		// Piped stdin makes interactive mode impossible (error); a redirected stdout just means the user might not see the prompts (warning)
+		// Piped stdin makes interactive mode impossible (fatal: the menu can't fix it); a redirected stdout just means the user might not see the prompts (warning)
 		if (s.Interactive)
 		{
-			record.FailIf(JSL::IO::Pipe::IsPiped(), "Interactive mode requires keyboard input, but stdin is piped or redirected");
+			record.FatalIf(JSL::IO::Pipe::IsPiped(), "Interactive mode requires keyboard input, but stdin is piped or redirected");
 			record.WarnIf(!JSL::Display::Terminal().IsANSICapable(), "Interactive mode with stdout not connected to a terminal: prompts may not be visible");
 		}
 	}
 } // namespace
 
+void validation::Status::LogWarnings() const
+{
+	if (!Warnings.empty())
+	{
+		LOG(WARN) << constructMessage(Warnings, "warning");
+	}
+}
+
+void validation::Status::LogErrors() const
+{
+	if (!Errors.empty())
+	{
+		LOG(ERROR) << constructMessage(Errors, "error");
+	}
+}
+
+void validation::Status::ThrowIfFatal() const
+{
+	if (!Fatal.empty())
+	{
+		throw std::invalid_argument(constructMessage(Fatal, "fatal error"));
+	}
+}
+
+void validation::Status::ThrowIfInvalid() const
+{
+	if (Valid())
+	{
+		return;
+	}
+
+	std::string msg = constructMessage(Fatal, "fatal error");
+	if (!Fatal.empty() && !Errors.empty())
+	{
+		msg += "\n";
+	}
+	msg += constructMessage(Errors, "error");
+	throw std::invalid_argument(msg);
+}
+
 validation::Status querySettingsConstraints(const MainSettings &target)
 {
-	validation::Recorder record;
+	Recorder record;
 
 	validateRuntime(target.Runtime, record);
 
-	return {record.Valid, record.Errors, record.Warnings};
+	return record; // slices down to the Status (implicitly moved)
 }
 
 void validateSettings(const MainSettings &target)
 {
-	auto status = querySettingsConstraints(target);
+	const auto status = querySettingsConstraints(target);
 
-	// Interactive mode is different; we allow an invalid startup (but will refuse to start a sim until the validation
-	validation::warnIfAny(status.Warnings);
-	validation::throwIfAny(status.Errors, target.Runtime.Interactive);
+	status.LogWarnings();
+	status.ThrowIfInvalid();
 }

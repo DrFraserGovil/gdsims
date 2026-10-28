@@ -1,85 +1,72 @@
 #pragma once
-#include <JSL/Log.h>
+#include "validate.h"
 #include <JSL/Strings/MakeFrom.h>
 #include <sstream>
-#include <stdexcept>
 #include <string>
+#include <string_view>
 #include <vector>
 
-// Machinery for validate.cpp: lets each check be written as a single failIf(...) line.
+// Machinery for validate.cpp: lets each check be written as a single record.FailIf(...) line.
 namespace validation
 {
 	using QueuedMsg = std::vector<std::string>;
 
-	class Recorder
+	// A Status which can be filled in one check at a time. Message parts are concatenated, each stringified via JSL's makeFrom (avoids std::format, which is unreliable on Apple Clang).
+	class Recorder : public Status
 	{
 	  public:
-		bool Valid = true;
-		std::vector<std::string> Errors;
-		std::vector<std::string> Warnings;
+		// Records a fatal error if the condition is true: the program cannot continue, even in interactive mode.
+		template <JSL::String::CanMakeFrom... Parts>
+		void FatalIf(bool condition, const Parts &...parts)
+		{
+			recordIf(Fatal, condition, parts...);
+		}
 
-		// Records an error message if the condition is true. The message is the concatenation of all parts, each stringified via JSL's makeFrom (avoids std::format, which is unreliable on Apple Clang).
+		// Records an error if the condition is true: a simulation cannot be launched until it is fixed.
 		template <JSL::String::CanMakeFrom... Parts>
 		void FailIf(bool condition, const Parts &...parts)
 		{
-			if (condition)
-			{
-				Valid = false;
-				Errors.push_back((std::string{} + ... + JSL::String::makeFrom(parts)));
-			}
+			recordIf(Errors, condition, parts...);
 		}
-		// Logs a warning (but doesn't fail validation) if the condition is true. Message parts are joined as in failIf.
+
+		// Records a warning if the condition is true: doesn't fail validation.
 		template <JSL::String::CanMakeFrom... Parts>
 		void WarnIf(bool condition, const Parts &...parts)
 		{
+			recordIf(Warnings, condition, parts...);
+		}
+
+	  private:
+		template <JSL::String::CanMakeFrom... Parts>
+		static void recordIf(QueuedMsg &target, bool condition, const Parts &...parts)
+		{
 			if (condition)
 			{
-				Warnings.push_back((std::string{} + ... + JSL::String::makeFrom(parts)));
+				target.push_back((std::string{} + ... + JSL::String::makeFrom(parts)));
 			}
 		}
 	};
 
-	inline std::string constructMessage(const QueuedMsg &msg, const std::string type)
+	// Formats a list of messages under a header line (numbered if there is more than one). Returns an empty string if there are no messages.
+	inline std::string constructMessage(const QueuedMsg &msg, std::string_view type)
 	{
 		const size_t n = msg.size();
+		if (n == 0)
+		{
+			return "";
+		}
+
 		std::ostringstream os;
-		os << "Settings-Validation gave " << n << " " << type << (n > 1 ? "s" : "") << "\n";
+		os << "Settings-Validation gave " << n << " " << type << (n > 1 ? "s" : "");
 		for (size_t e = 0; e < n; ++e)
 		{
-			os << "\t";
+			os << "\n\t";
 			if (n > 1)
 			{
 				os << e + 1 << ") ";
 			}
-			os << msg[e] << "\n";
+			os << msg[e];
 		}
 		return os.str();
-	}
-
-	// Throws a single std::invalid_argument listing every collected error (numbered if there is more than one).
-	inline void throwIfAny(const QueuedMsg &errors, bool logNotThrow)
-	{
-		if (errors.empty())
-		{
-			return;
-		}
-
-		auto msg = constructMessage(errors, "error");
-		if (logNotThrow)
-		{
-			LOG(ERROR) << msg;
-			LOG(INFO) << "These must be fixed in interactive mode before a simulation can be launched";
-		}
-		else
-		{
-			throw std::invalid_argument(msg);
-		}
-	}
-
-	inline void warnIfAny(const QueuedMsg &warnings)
-	{
-		if (warnings.empty()) return;
-
-		LOG(WARN) << constructMessage(warnings, "error");
 	}
 } // namespace validation

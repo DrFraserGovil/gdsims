@@ -1,12 +1,19 @@
 #include "initialise.h"
-#include "settings/MainSettings.h"
-#include "settings/validate.h"
 #include <JSL.h>
 int main(int argc, char **argv)
 {
 	try
 	{
-		auto mode = readConfiguration(argc, argv);
+		const Mode mode = readConfiguration(argc, argv);
+		switch (mode)
+		{
+			case Mode::Run:
+				// TODO: launch the simulation
+				break;
+			case Mode::Interactive:
+				// TODO: launch the interactive menu
+				break;
+		}
 	}
 	catch (std::exception &e)
 	{
