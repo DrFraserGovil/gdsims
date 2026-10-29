@@ -1,0 +1,19 @@
+title: JSL
+alias: jsl
+------------------
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=blue,
+}
+----------------
+
+JSL is the \href{https://github.com/DrFraserGovil/JSL}{Jack Standard Library}, it is a code library that I maintain, and which GDSiMS now depends upon, via an automatic inclusion in the [[build system]].
+
+Each version of GDSiMs is pegged to a specific version of JSL (currently 3.5.1) via a github link, which means that whenever someone attempts to compile the code, cmake compares the version of JSL it currently has (if any), and if a newer version is required, it pulls it from Github automatically.
+
+So long as Github is live, this therefore requires no further interaction by the user, it just works!
+
+The main reason for including JSL is the extensive and powerful configuration module, which is what powers the configuration interface of GDSiMS; converting user-input strings into strongly typed variables. For this reason, we also use the [[lsj]] tool for development.

@@ -1,0 +1,25 @@
+title: Build System
+alias: build
+------------------------------
+
+The original GDSiMS had a slightly cumbersome method to get a binary out of the source code - which is something we want to avoid. We want it to be as simple ass possible to get a working binary on a new machine. As such, I've adopted a dual Makefile/CMake system that I have used well in the past, which allows a user to issue a single command, and have everything they need appear:
+
+\begin{Code}
+	cd /install/location/of/gdsims
+
+	make
+\end{Code}
+
+This command alone should give users what they want: a compiled _gdsims_ (or _gdsims.exe_ on Windows) executable that they can then run. We also support a wide variety of other [[make options]].
+
+\subsection{IDE \& Integrated Compilers}
+
+	The _make_ command is for users compiling on a terminal-based environment (such as a compute cluster) - many users will be using a heavyweight integrated system, such as Visual Studio.
+
+	The compiler commands are constructed using CMake (and enumerated in _CMakeLists.txt_ and _CMakePresets.json_), which should allow these integrated systems to see them and inherit the commands without further configuration; the usual 'Compile' options in these editors should then use the same presets as when using the _make_ interface.
+
+
+
+
+
+

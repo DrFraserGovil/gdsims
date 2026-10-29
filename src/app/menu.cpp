@@ -110,13 +110,13 @@ namespace
 		deriveSettingsValues();
 		auto status = querySettingsConstraints(Settings);
 
+		status.ThrowIfFatal();
 		if (!status.Valid())
 		{
 			LOG(WARN) << "The settings are in an invalid state: a simulation will refuse to launch until this is rectified";
 		}
 		status.LogWarnings();
 		status.LogErrors();
-		status.ThrowIfFatal();
 
 		// Reconfigure and reparse
 	}

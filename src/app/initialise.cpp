@@ -13,7 +13,7 @@ namespace
 	}
 	Mode parseCommands()
 	{
-		auto cmds = Settings.Commands;
+		const auto &cmds = Settings.Commands;
 		LOG(DEBUG) << "Parsing Commands " << cmds;
 
 		if (cmds.empty() || singleCmd(cmds, "run"))
@@ -61,8 +61,10 @@ Mode readConfiguration(int argc, char **argv)
 			}
 			break;
 		}
-		default: // anything else gets strictly checked by default
+		case Mode::Run: {
 			validateSettings(Settings);
+			break;
+		}
 	}
 
 	return mode;

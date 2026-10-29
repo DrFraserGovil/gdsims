@@ -6,3 +6,7 @@ gdsims_profile
 tests/gdsims_tests
 output_files
 .jvim.session
+*/.cortex/build
+*/.cortex/fragments
+*/.cortex/.buildstate.tsv
+notes/view

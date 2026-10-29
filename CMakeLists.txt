@@ -18,7 +18,7 @@ include (FetchContent) # Needed for JSL and Catch2
  
 ### ADD THE JSL LIBRARY
 option(FORCE_JSL_CLONE "Force a JSL clone instead of using a local copy" OFF)
-set(LOCAL_JSL "/home/frasergj/docs/Code/JSL")
+set(LOCAL_JSL "/home/frasergj/docs/Code/JSL" CACHE PATH "Local JSL checkout, used in place of the GitHub copy if it exists (override with -DLOCAL_JSL=...)")
 if((NOT FORCE_JSL_CLONE) AND (EXISTS "${LOCAL_JSL}/CMakeLists.txt"))
 	message(STATUS "Using local JSL from ${LOCAL_JSL}")
 	add_subdirectory("${LOCAL_JSL}" "${CMAKE_CURRENT_BINARY_DIR}/jsl_build")
@@ -54,11 +54,33 @@ endif()
 		target_compile_options(gdsims_warnings INTERFACE $<$<CONFIG:RelWithDebInfo>:-fno-omit-frame-pointer>)
 	endif()
 
+### MIRROR THE SETTINGS (lsj regenerates the .autogen FieldLists from the settings headers)
+	## Done here rather than in the Makefile, so that IDE builds stay in sync too. Without lsj, the committed .autogen files are used as-is
+	set(GDSIMS_MIRROR_FLAGS "-fq" CACHE STRING "Flags passed to lsj when mirroring the settings")
+	find_program(LSJ_EXECUTABLE lsj)
+	if(LSJ_EXECUTABLE)
+		separate_arguments(GDSIMS_MIRROR_ARGS NATIVE_COMMAND "${GDSIMS_MIRROR_FLAGS}")
+		file(GLOB_RECURSE AUTOGEN_FILES CONFIGURE_DEPENDS "src/*.autogen")
+		# BYPRODUCTS tells Ninja the .autogen files may change mid-build, so their dependents are rechecked afterwards
+		add_custom_target(reflection
+			COMMAND "${LSJ_EXECUTABLE}" src ${GDSIMS_MIRROR_ARGS}
+			WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+			BYPRODUCTS ${AUTOGEN_FILES}
+			COMMENT "Mirroring settings with lsj"
+			VERBATIM
+		)
+	else()
+		message(STATUS "lsj not found: using the cached .autogen settings files")
+	endif()
+
 ### COMPILE THE LIBRARY (Everything except src/app)
 	file(GLOB_RECURSE LIB_SOURCES CONFIGURE_DEPENDS "src/*.cpp")
 	list(FILTER LIB_SOURCES EXCLUDE REGEX "/src/app/")        # all of app/ stays out of the library
 
 	add_library(gdsimslib STATIC ${LIB_SOURCES})
+	if(TARGET reflection)
+		add_dependencies(gdsimslib reflection)
+	endif()
 	target_link_libraries(gdsimslib PUBLIC JSL)
 	target_link_libraries(gdsimslib PRIVATE gdsims_warnings)
 	target_include_directories(gdsimslib PUBLIC src)

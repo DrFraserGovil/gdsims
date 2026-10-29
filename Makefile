@@ -5,32 +5,35 @@ BUILD_DIR = .build
 MIRROR_FLAGS ?= -vf
 MAKEFLAGS += --no-print-directory
 
-# $(call build,<build dir>,<build type>,<target>,<extra cmake flags>[,<mirror flags>])
-# Mirrors settings, configures the build dir (if it has never been configured, or a previous configure failed partway), then builds the target.
+# The build configurations live in CMakePresets.json (so IDEs see the same ones); these targets are shortcuts for them.
+# Mirroring the settings with lsj is part of the CMake build.
+
+# $(call build,<preset>,<build dir>)
+# Configures the build dir (if it has never been configured, or a previous configure failed partway), then builds the preset's target.
 define build
-	@$(MAKE) mirror MIRROR_FLAGS=$(or $(5),-fq)
-	@if [ ! -f "$(1)/CMakeCache.txt" ] || [ ! -f "$(1)/Makefile" ]; then \
-		cmake -S . -B $(1) -DCMAKE_BUILD_TYPE=$(2) $(4); \
+	@if [ ! -f "$(2)/CMakeCache.txt" ] || [ ! -f "$(2)/Makefile" ]; then \
+		cmake --preset $(1); \
 	fi
-	@cmake --build $(1) --config $(2) --target $(3) $(EXTRA_BUILD_FLAGS)
+	@cmake --build --preset $(1) $(EXTRA_BUILD_FLAGS)
 endef
 
 all:
-	$(call build,$(BUILD_DIR),Release,gdsims,-DFORCE_JSL_CLONE=OFF)
+	$(call build,release,$(BUILD_DIR))
 
 ship:
-	$(call build,$(BUILD_DIR)-ship,Release,gdsims,-DFORCE_JSL_CLONE=ON,$(MIRROR_FLAGS))
+	$(call build,ship,$(BUILD_DIR)-ship)
 
 debug:
-	$(call build,$(BUILD_DIR)-debug,Debug,gdsims,-DFORCE_JSL_CLONE=OFF)
+	$(call build,debug,$(BUILD_DIR)-debug)
 
 profile:
-	$(call build,$(BUILD_DIR)-profile,RelWithDebInfo,gdsims,-DFORCE_JSL_CLONE=OFF)
+	$(call build,profile,$(BUILD_DIR)-profile)
 
 test:
-	$(call build,$(BUILD_DIR)-test,Debug,gdsims_tests,-DFORCE_JSL_CLONE=OFF -DGDSIMS_BUILD_TESTS=ON)
-	@ctest --test-dir $(BUILD_DIR)-test -C Debug --output-on-failure
+	$(call build,test,$(BUILD_DIR)-test)
+	@ctest --preset test
 
+# Manual mirror, without building
 mirror:
 	@command -v lsj>/dev/null 2>&1 && lsj src $(MIRROR_FLAGS) || echo "no mirror found, using cached values"
 
