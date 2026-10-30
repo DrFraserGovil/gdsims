@@ -16,7 +16,7 @@ void runSimulation()
 
 void printVersion()
 {
-	std::cout << version::String << "\n";
+	std::cout << Version::String << "\n";
 }
 
 void dump()

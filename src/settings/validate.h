@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-namespace validation
+namespace Validation
 {
 	//! @brief The outcome of a settings validation, split by severity
 	//! @details Fatal: the program cannot run at all. Errors: a simulation cannot be launched, but (in interactive mode) the settings can still be fixed. Warnings: informational only.
@@ -28,12 +28,12 @@ namespace validation
 		//! @brief Throws a std::invalid_argument listing the fatal errors and errors, if there are any
 		void ThrowIfInvalid() const;
 	};
-} // namespace validation
+} // namespace Validation
 
 //! @brief Collects a status object for the provided settings object, but does not throw or print anything
 //! @param target a full-suite settings object to be queried
 //! @returns A status object detailing any fatal errors, errors or warnings
-validation::Status querySettingsConstraints(const MainSettings &target);
+Validation::Status querySettingsConstraints(const MainSettings &target);
 
 //! @brief Strict validation: equivalent to calling querySettingsConstraints, then LogWarnings and ThrowIfInvalid on the result
 //! @details Throws if target has any fatal errors or errors (and logs warnings first)

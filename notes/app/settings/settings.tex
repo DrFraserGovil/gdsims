@@ -1,0 +1,62 @@
+title: User-Configurable Settings
+alias: settings, configuration
+todo:
+------------------------------
+\usepackage{listings}
+\lstset{language=C++,basicstyle=\small\ttfamily,backgroundcolor=\color{black!10!white},columns=fullflexible,tabsize=4}
+------------------------------
+
+Every user-configurable value in GDSiMS lives in a single settings object, constructed from [[lsj|reflection of the JSL configuration module]]. This gives each setting a command-line flag, a configuration-file entry, an entry in the help screen -- amongst others -- with no more code than declaring the variable itself.
+
+\section{Structure}
+
+	The settings are grouped into sections, each a class in _src/settings/_, which are collected together in _MainSettings_:
+
+	* _Runtime_: how the program runs (logging verbosity, number of threads), as opposed to what it simulates.
+	* _Simulation_: the parameters of the simulation itself.
+
+	A section can itself contain further sections, and the parsing, help and configuration all descend through them automatically.
+
+\section{Setting values}
+
+	A setting can be given a value in three ways, in increasing order of priority:
+
+	* Its default, written in the class declaration.
+	* A configuration file, given with _-config file_, containing one _key value_ pair per line.
+	* The command line.
+
+	So, for example, a configuration file can hold a standard set of parameters, with one or two then changed on the command line for a particular run:
+
+	\begin{lstlisting}[language=bash]
+./gdsims -config standard.cfg -T 365
+\end{lstlisting}
+
+	The full list of settings, with their flags and defaults, is always available from _./gdsims -h_.
+
+\section{Accessing the settings in code}
+
+	There is a single global settings object, _Settings_. For all intents and purposes, this is a **read-only** object, which cannot be modified. However, since it is global, the value of the settings can be read by any file.
+
+	\subsection{Changing the Settings}
+
+		***Do Not Do This***.
+
+		The settings are only changed when the user directs their value be changed (such as at startup or during an interactive session) -- never during the normal running of the code.
+
+\section{Derived values}
+
+	Some things are not settings in their own right, but follow from them: for example, the log level follows from the _-q_, _-s_ and _-v_ flags. These are computed in a single place, _deriveSettingsValues()_ (_src/settings/derive.cpp_), which is called every time the settings change. Anything which is calculated from the settings, rather than set directly, belongs there.
+
+\section{Adding a setting}
+
+	Add a documented member to the relevant section:
+
+	\begin{lstlisting}
+//! @brief The number of timesteps to run the simulation for
+//! @alias T, TimeSteps
+int TimeSteps = 100;
+\end{lstlisting}
+
+	Then rebuild: the [[lsj]] mirror runs as part of the build, and the new setting immediately has a flag (any of the assigned aliases, such as _-T_), a help entry and a configuration-file key.
+
+	If the setting has a constraint (a value which must be positive, or two settings which are incompatible), add a check for it to the [[validation]].

@@ -1,0 +1,49 @@
+title: Unit Tests
+alias: unit tests
+todo:
+------------------------------
+\usepackage{listings}
+\lstset{language=C++,basicstyle=\small\ttfamily,backgroundcolor=\color{black!10!white},columns=fullflexible,tabsize=4}
+------------------------------
+
+GDSiMS uses the \href{https://github.com/catchorg/Catch2}{Catch2} testing framework (version 3), fetched automatically by CMake the first time the tests are built. The entire suite is built and run with a single [[make options|command]]:
+
+\begin{Code}
+	make test
+\end{Code}
+
+The tests are built in debug mode, with the sanitizers on, so a test which (for example) reads past the end of an array fails loudly, even if it would have happened to give the right answer.
+
+\section{Layout}
+
+	The test sources live in _tests/_, one file per area of the code. Every _.cpp_ file in that directory is picked up automatically, so a new test file needs no changes to the build.
+
+	The tests link against the same static library as the executable, so they test the real code, rather than a copy of it. Code in _src/app/_ is not part of that library: anything worth testing should therefore live in the library, with _src/app/_ kept as thin as possible.
+
+	The compiled test binary is placed at _tests/gdsims\_tests_, and can be run directly, which gives access to Catch2's own options; for example, to run only the tests with a given tag:
+
+	\begin{Code}
+		./tests/gdsims\_tests "[validation]"
+	\end{Code}
+
+\section{Writing tests}
+
+	A test checks one behaviour, and is named for that behaviour:
+
+	\begin{lstlisting}
+TEST_CASE("A thread count of zero is an error, but not fatal", "[validation]")
+{
+	MainSettings s;
+	s.Runtime.ParallelThreads = 0;
+	auto status = querySettingsConstraints(s);
+	REQUIRE(status.Errors.size() == 1);
+	REQUIRE(status.Fatal.empty());
+}
+\end{lstlisting}
+
+	Some things to bear in mind:
+
+	* Tests should construct their own settings, rather than modifying the global _Settings_ object, so that they cannot affect one another.
+	* Behaviour which depends on the machine (the number of cores, whether a terminal is attached) should either be skipped (with _SKIP_) when the precondition does not hold, or not tested at all.
+	* Anything stochastic should be tested with a fixed seed, or with a statistical tolerance wide enough that the test does not fail by chance.
+

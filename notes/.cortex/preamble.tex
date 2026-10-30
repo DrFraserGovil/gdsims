@@ -1,9 +1,23 @@
 %% ALL DECLARATIONS HERE ARE SHARED WITH ALL FILES IN THE ARCHIVE
 
-\setlength\parskip{5pt}
-\setlength\parindent{0pt}
+%%%%%% PACKAGE
 \usepackage{tcolorbox}
 \tcbuselibrary{skins}
+\usepackage{tabularx}
+\usepackage{hyperref}
+
+%%%%%%% FORMAT 
+\setcounter{secnumdepth}{0}
+\setlength\parskip{5pt}
+\setlength\parindent{0pt}
+\renewcommand\CortexTitle[1]
+{
+	{\huge \bf  #1\par\vspace{0.3cm}}
+}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+
+%%%%%%%% ENVIRONMENTS
+
 \NewDocumentEnvironment{Code}{O{}}
 {
 	\begin{tcolorbox}[colframe=gray!50,colback=black!10!white,boxsep=0pt, left=2pt,right=2pt,  top=5pt,bottom=4pt,    arc=1mm,opacityback=0.6,enhanced jigsaw,#1]
@@ -11,10 +25,11 @@
 		}
 		{
 	\end{tcolorbox}
-}
+}{}
 
-\setcounter{secnumdepth}{0}
-\renewcommand\CortexTitle[1]
+\NewDocumentEnvironment{tabx}{O{\linewidth}m +b}
 {
-	{\huge \bf  #1\par\vspace{0.3cm}}
-}
+	\begin{tabularx}{#1}{#2}
+		#3
+	\end{tabularx}
+}{}

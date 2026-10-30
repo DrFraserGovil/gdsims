@@ -1,0 +1,38 @@
+title: The Environment File
+alias: environment file, environment cache, gdenv
+todo:
+------------------------------------
+%
+% \textit{This note describes the design agreed for the revamp; it has not yet been implemented.}
+%
+% Building a [[mesh]] (finding neighbours, computing [[conformal|effective distances]], drawing the baseline [[capacity|capacities]], normalising the dispersal probabilities) is expensive for a large landscape, and its result does not change from one run to the next. It is therefore done once, and the result is saved as an *environment*: a single file which can then be loaded by any number of later runs.
+%
+% \section{What it contains}
+%
+% 	The environment holds everything which describes the *landscape*, and nothing else:
+%
+% 	* The nodes, their positions, and the edges between them (with their final probabilities).
+% 	* Every [[mesh|node field]], including the drawn baseline capacities.
+% 	* The rainfall time series.
+% 	* A record of how it was made: the GDSiMS [[version]], the settings it was built from, and the input files used.
+%
+% 	The final point matters for reproducibility: an environment file is enough, by itself, to say exactly what landscape a result was produced on.
+%
+% \section{Three separate layers}
+%
+% 	A simulation is made from three independent pieces, which can each be varied without touching the others:
+%
+% 	* \textbf{Environment}: the landscape, as above.
+% 	* \textbf{Scenario}: what happens in it: the initial populations, and when and where gene-drive mosquitoes are released (referring to nodes by their index).
+% 	* \textbf{Biology}: the parameters of the mosquitoes themselves: mortality rates, development times, the inheritance of the drive.
+%
+% 	So, for example, several release strategies can be compared on exactly the same landscape, or the same strategy tested against a range of biological parameters, without the landscape being rebuilt each time.
+%
+% \section{The file}
+%
+% 	The environment is stored as a single archive (using the [[JSL]] archive module), containing one file per table. A single file is easy to share alongside a result, and loading one is a single option on the command line. A new environment is written using a dedicated command (see [[commands]]), which builds the environment from the given settings and saves it, without running a simulation.
+%
+% \section{Open questions}
+%
+% 	* What format should the input data (node positions, capacities, groups, human-transport routes) be given in?
+% 	* Should a run which is not given an environment build one on the fly (as the original code does) and, if so, should it save it automatically?

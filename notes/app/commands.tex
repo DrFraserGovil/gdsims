@@ -1,0 +1,57 @@
+title: Commands and Modes
+alias: commands, modes
+todo:
+------------------------------
+
+GDSiMS is launched with an optional *command*, followed by any number of settings flags (see [[settings]]):
+
+\begin{Code}
+	./gdsims [command] -flag value -flag value ...
+\end{Code}
+
+The command chooses what the program does (its *mode*); the flags configure it. Exactly one command may be given, and if none is, _run_ is assumed. The available commands are:
+
+\begin{center}
+	\begin{tabular}{l p{12cm}}
+		\bf Command   & \bf Effect                                                                                                                      \\
+		\hline
+		_run_         & Run a simulation with the given settings, then exit. The default.                                                               \\
+		_interactive_ & Open the [[interactive mode|interactive menu]], from which the settings can be inspected and changed, and simulations launched. \\
+		_version_     & Print the version number, then exit.                                                                                            \\
+		_help_        & Print the full list of commands and settings, then exit (equivalent to the _-h_ flag).
+	\end{tabular}
+\end{center}
+
+An unknown command, or more than one command, is an error, and the program exits without doing anything.
+
+\section{Start-up sequence}
+
+	Whichever command is given, start-up follows the same steps:
+
+	* Parse the command line (and any configuration file given with _-config_) into the global settings.
+	* Derive any values which follow from the settings, for example, setting the log level from the _-q_, _-s_ and _-v_ flags.
+	* Identify the mode from the command.
+		* [[validation|Validate]] the settings, with a strictness which depends on the mode.
+
+	How strict the validation is depends on what the mode is about to do:
+
+	* _run_ is strict: any error at all halts the program before the simulation begins, as there is no way to fix the settings once the run is under way.
+	* _interactive_ only halts on a fatal error (one which makes the menu itself unusable, such as input being piped in). Ordinary errors are reported, but the menu still opens, since the whole point of the menu is to be able to fix them; a simulation cannot be launched from the menu until they are fixed.
+	* _version_ (and _help_) do not validate at all: they never use the settings, so a broken configuration should not stop a user from finding out which version they have.
+
+\section{Errors}
+
+	If anything goes wrong which the program cannot recover from, a single line beginning _FATAL ERROR_ is printed to the standard error stream (so it is still seen if the normal output is redirected to a file), and the program exits with code 1. A full log of what went wrong, including where in the code it happened, is written to the log beforehand.
+
+	A script can therefore test for success in the usual way, by checking that the exit code is zero.
+
+\section{Adding a command}
+
+	A new command needs:
+
+	* A _//! @command name description_ line above _MainSettings_, so that it appears in the help screen.
+	* A new value in the _Mode_ enumeration (_src/app/initialise.h_), and a line in the command parser which recognises it.
+	* A decision about how strictly it validates, in _readConfiguration_.
+	* A case in _main_ which calls the function that carries it out.
+
+	The compiler warns if a new mode is added without being handled everywhere a mode is switched on (the _switch_ statements deliberately have no _default_ case for this reason), so the last two steps cannot be forgotten.

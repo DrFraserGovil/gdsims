@@ -1,0 +1,57 @@
+title: Interactive Mode
+alias: interactive, menu, interactive menu
+todo:
+------------------------------
+
+Launching GDSiMS with the _interactive_ [[commands|command]] opens a menu, from which the settings can be inspected and changed, and simulations launched, without the need to retype a long command line each time:
+
+\begin{Code}
+	./gdsims interactive -T 365
+
+	gdsims> help
+\end{Code}
+
+% Any flags given on the command line are applied before the menu opens, so they act as the starting point. The menu then accepts the following commands:
+%
+% \begin{center}
+% 	\begin{tabular}{l p{12cm}}
+% 		\bf Command   & \bf Effect                                                                                                        \\
+% 		\hline
+% 		_run [flags]_ & Launch a simulation with the current settings. Any flags given apply to this run only (see below).                \\
+% 		_settings_    & Open the configuration interface, in which settings can be viewed and changed. Type _save_ to return to the menu. \\
+% 		_dump_        & (not yet implemented)                                                                                             \\
+% 		_version_     & Print the version number.                                                                                         \\
+% 		_help_        & List the commands.                                                                                                \\
+% 		_quit_        & Leave the menu (as does _exit_, or Ctrl-D).
+% 	\end{tabular}
+% \end{center}
+%
+% A command which fails (for example, a _run_ with a misspelled flag) reports the error, and returns to the menu, rather than exiting the program.
+%
+% \section{One-off runs}
+%
+% 	The _run_ command accepts exactly the same flags as the command line, and they are applied on top of the current settings for that one run only. Afterwards, the settings return to what they were before. This makes it easy to try a variation without losing the base configuration:
+%
+% 	\begin{Code}
+% 		gdsims> run -T 50
+%
+% 		gdsims> run -T 500
+% 	\end{Code}
+%
+% 	Both runs use the same settings except for the number of timesteps. To change a setting permanently, use the _settings_ menu instead. _run help_ prints the full list of flags.
+%
+% \section{Invalid settings}
+%
+% 	The menu deliberately allows the settings to be in an invalid state (for example, a thread count larger than the machine supports), since a user who has just made a mistake needs to be able to correct it. Whenever the settings menu is closed with _save_, the new settings are [[validation|validated]], and any problems are reported. A simulation cannot be launched until every error is resolved; trying to do so prints a reminder of what still needs fixing.
+%
+% 	The one exception is a *fatal* problem, which makes the menu itself unusable: the most common is starting interactive mode with input piped in from a file, in which case the program exits immediately.
+%
+% \section{Output}
+%
+% 	Prompts and any output requested by the user are always printed, even in quiet (_-q_) or silent (_-s_) mode, as hiding them would make the menu unusable. Banners and hints are part of the ordinary log, and so are hidden by those modes.
+%
+% \section{Still to do}
+%
+% 	* The _dump_ command (writing the current settings, or the [[environment]], to a file).
+% 	* Arguments containing spaces cannot yet be passed to _run_, as the line is split on every space.
+% 	* Unexpected arguments given to _settings_, _dump_ and _version_ are currently ignored, rather than reported.

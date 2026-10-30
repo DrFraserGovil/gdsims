@@ -1,0 +1,54 @@
+title: GDSiMS App
+alias: app-interface, app
+-----------------
+\usepackage{enumitem}
+\newcommand\mode[2]
+{
+% \item[#1] #2
+\\ {\tt \large #1 }& #2
+}
+---------------
+The GDSiMS `app' will be the portion of the code dedicated to providing a user interface and a wrapper around the other libraries, determining which code to run based on the runtime variables given to it.
+
+
+% The the app itself will be very simple:
+%
+% *ENUM At startup, parse the user input into [[User-Configurable Settings]]
+% 	* [[Validate]] that the settings are good.
+% * Determine which [[commands]] have been passed, and execute the corresponding library codes
+%
+\section{Launching the App}
+
+	GDSiMS is launched with an optional *command*, followed by any number of settings flags:
+
+	\begin{Code}
+		./gdsims [command] -flag value -flag value ...
+	\end{Code}
+
+	At startup, the app:
+
+	*ENUM Parses the setting flags into the [[User-Configurable Settings]]
+	* Performs [[Validate|Validation checks]] on the values to ensure they are well-defined
+	* Uses the command to work out which mode has been asked for.
+
+\section{Commands \& Modes}
+
+	The command chooses which `mode' the code runs in. If no command is given, _help_ is assumed.
+
+	\begin{tabx}{rX}
+		\mode{run}{Activates a [[Simulation]] run, which requires the input of a valid mesh file.}
+		\mode{map}{ Activates a [[mesh|Mesh-generation]] run, and saves the result to file.}
+		\mode{full}{A wrapper for calling _map_ followed by _run_; generates a mesh and then immediately initiates a simulation on it.}
+		\mode{interactive}{Begins [[interactive mode]], a console wrapper from which more advanced commands and configuration can be executed.}
+		\mode{help}{Prints a full list of commands and settings, and then exits. (equivalent to passing the _-h_ flag).}
+		\mode{version}{ Prints the current [[version]] to the terminal, then exits.}
+	\end{tabx}
+
+
+
+
+\section{Errors}
+
+	If anything goes wrong which the program cannot recover from, a single line beginning _FATAL ERROR_ is printed to the standard error stream (so it is still seen if the normal output is redirected to a file), and the program exits with code 1. A full log of what went wrong, including where in the code it happened, is written to the log beforehand.
+
+	A script can therefore test for success in the usual way, by checking that the exit code is zero.

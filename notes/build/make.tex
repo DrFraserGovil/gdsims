@@ -2,7 +2,7 @@ title: Build System
 alias: build
 ------------------------------
 
-The original GDSiMS had a slightly cumbersome method to get a binary out of the source code - which is something we want to avoid. We want it to be as simple ass possible to get a working binary on a new machine. As such, I've adopted a dual Makefile/CMake system that I have used well in the past, which allows a user to issue a single command, and have everything they need appear:
+The original GDSiMS had a slightly cumbersome method to get a binary out of the source code - which is something we want to avoid. We want it to be as simple as possible to get a working binary on a new machine. As such, I've adopted a dual Makefile/CMake system that I have used well in the past, which allows a user to issue a single command, and have everything they need appear:
 
 \begin{Code}
 	cd /install/location/of/gdsims
@@ -12,13 +12,21 @@ The original GDSiMS had a slightly cumbersome method to get a binary out of the 
 
 This command alone should give users what they want: a compiled _gdsims_ (or _gdsims.exe_ on Windows) executable that they can then run. We also support a wide variety of other [[make options]].
 
-\subsection{IDE \& Integrated Compilers}
 
-	The _make_ command is for users compiling on a terminal-based environment (such as a compute cluster) - many users will be using a heavyweight integrated system, such as Visual Studio.
+\subsection{The Tiers of the Build System}
 
-	The compiler commands are constructed using CMake (and enumerated in _CMakeLists.txt_ and _CMakePresets.json_), which should allow these integrated systems to see them and inherit the commands without further configuration; the usual 'Compile' options in these editors should then use the same presets as when using the _make_ interface.
+	There are three layers of the build system, designed to be used by different entities:
 
+	* _Makefile_: a set of memorable shortcuts ([[make options]]), each of which names a preset. This is used by people compiling on the command line by calling _make_.
+	* _CMakePresets.json_: the named build configurations (build directory, build type, and which options are on). Individuals using IDEs (such as Visual Studio) will use this\footnote{If its not detected automatically}, allowing an IDE to show the options in the configuration drop-down menu.
+	* _CMakeLists.txt_: the actual build logic: fetching dependencies, running the precompiler-reflection\footnote{If installed, see [[external dependencies]]}, generating the [[version]] header, and compiling the library and the executable. Users should only use this if they want to perform manual cmake alterations; else it is read by the machine.
+\subsection{Requirements}
 
+	The build needs only:
+
+	* A C++20 compiler (a recent GCC, Clang or MSVC)
+	* CMake version 3.21 or later (needed for _CMakePresets.json_)
+	* _git_ and an internet connection on the first build, so that CMake can fetch the [[external dependencies]]
 
 
 

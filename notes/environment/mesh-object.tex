@@ -1,0 +1,39 @@
+title: The Mesh Object
+alias: mesh object, mesh-object, mesh
+------------
+
+
+The Mesh Object is one of the central engines of the GDSiMS code; it defines the environment through which the mosquitoes may move as their population evolves as a result of the proposed intervention.
+%
+%
+% The mesh is the spatial structure of the simulation: a set of *nodes* (patches), each holding its own mosquito population, connected by *edges* along which mosquitoes can move. As in the [[original mesh|original code]], each node represents a block of settlement (a village, or at high resolution, a cell of the map in which people live). A node is therefore not a region of uniform land, but a point at which mosquitoes and people are concentrated.
+%
+% \section{Always a graph}
+%
+% 	Whatever its origin, the mesh is always stored the same way: a sparse graph, with a list of nodes and, for each node, a list of the edges leaving it. There is no special treatment for regular grids, even though most real meshes are *nearly* regular: high-resolution maps (1 km cells) are a regular grid with holes in, where there are lakes, forest, or simply no-one living. A single representation keeps the simulation code simple, and means that every mesh, however it was made, behaves identically once loaded.
+%
+% 	Each edge stores the final probability that a mosquito leaving its source node arrives at its target, already normalised and multiplied by the rate at which mosquitoes leave. The probability that a mosquito leaving a node is lost (because it flies into an area with no nodes, or off the edge of the map) is stored per node, as whatever remains. Nothing about distances or kernels is needed during the simulation itself: it is all precomputed when the [[environment]] is built.
+%
+% \section{Two kinds of edge}
+%
+% 	Mosquitoes move in two very different ways, and so the graph is built from two sets of edges, which are merged together:
+%
+% 	* \textbf{Local flight}: edges between nearby nodes, built from their positions, a dispersal kernel, and the [[conformal|effective distance]] between them. These are short-range, and there are a great many of them.
+% 	* \textbf{Human transport}: edges along routes along which people (and so stowaway mosquitoes) travel: roads, ferries, and so on. These are supplied by the user as an explicit list, each with its own rate, and are long-range, but few in number.
+%
+% 	Keeping the two separate means that each can be modelled on its own terms; in particular, human transport across water can be modelled without having to decide whether mosquitoes can fly across it.
+%
+% \section{Finding neighbours}
+%
+% 	The original code compared every pair of nodes to find which are within range, which costs $\mathcal{O}(N^2)$, and becomes the dominant cost for large meshes. The new mesh instead bins the nodes into a spatial grid with cells the size of the maximum dispersal distance, so that only nodes in the same or adjacent cells need be compared, which brings the cost down to $\mathcal{O}(N)$.
+%
+% \section{Node fields}
+%
+% 	Many quantities are defined per node: the carrying capacity parameters (see [[capacity]]), the connectivity $u$ of the [[conformal]] metric, which rainfall series applies, and so on. Many of these are naturally shared between large groups of nodes (every node in a district has the same rainfall), but some genuinely vary from node to node.
+%
+% 	These are all represented by the same structure, a _NodeField_, which is either:
+%
+% 	* \textbf{Per node}: one value for each node.
+% 	* \textbf{Grouped}: a table of values, one per group, and a per-node index into that table.
+%
+% 	A value which is the same everywhere is simply a grouped field with a single group. The code which reads a node field does not need to know which kind it is.

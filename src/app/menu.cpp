@@ -42,17 +42,17 @@ namespace
 	class SettingsRestorer
 	{
 	  public:
-		SettingsRestorer() : saved(Settings) {}
+		SettingsRestorer() : Saved(Settings) {}
 		~SettingsRestorer()
 		{
-			ChangeSettings() = saved;
+			ChangeSettings() = Saved;
 			deriveSettingsValues();
 		}
 		SettingsRestorer(const SettingsRestorer &) = delete;
 		SettingsRestorer &operator=(const SettingsRestorer &) = delete;
 
 	  private:
-		const MainSettings saved;
+		const MainSettings Saved;
 	};
 
 	// Parses the menu line exactly as if it had been passed on the command line (so -config works too), layered on top of the current settings

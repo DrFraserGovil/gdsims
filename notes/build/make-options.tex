@@ -2,13 +2,82 @@ title: Make Options
 alias: make-options
 todo:
 ---------------------------
+\usepackage{listings}
+\lstset{basicstyle=\small\ttfamily,backgroundcolor=\color{black!10!white},frame=none,columns=fullflexible}
+---------------------------
 
 
 
-On its own, _make_ runs the _make all_ command, which compiles the code, re-using any unchanged cached code if possible. The following options are also available:
+On its own, _make_ runs the _make all_ command, which compiles the code, re-using any unchanged cached code if possible. The following options are also available.
 
-\section{\tt make all}
+Every build target is a thin shortcut for a CMake preset of the same name (defined in _CMakePresets.json_, see [[build system]]). The first time a target is used, it configures its own build directory with that preset, and every later call only rebuilds what has changed. This means that the options chosen at configure time (build type, which JSL to use, whether to build the tests) are remembered by that directory: if you change them, run _make purge_ first.
 
-	The default option, equivalent to _make_.
+\begin{center}
+	\begin{tabular}{l l l l}
+		\bf Target     & \bf Build directory & \bf CMake build type & \bf Output                     \\
+		\hline
+		_make all_     & _.build_            & Release              & _./gdsims_                     \\
+		_make ship_    & _.build-ship_       & Release              & _./gdsims_                     \\
+		_make debug_   & _.build-debug_      & Debug                & \texttt{./gdsims\_debug}       \\
+		_make profile_ & _.build-profile_    & RelWithDebInfo       & \texttt{./gdsims\_profile}     \\
+		_make test_    & _.build-test_       & Debug                & \texttt{./tests/gdsims\_tests}
+	\end{tabular}
+\end{center}
 
-\section{\tt make ship}
+The binaries are always placed in the repository root (or _tests/_ for the test suite), never inside the build directory, and the debug and profile binaries carry a suffix so that they never overwrite the main _gdsims_ executable.
+
+\section{Useful for Users}
+	\subsection{\tt make all}
+
+		The default option, equivalent to _make_. Produces an optimised (Release) build.
+	\subsection{\tt make purge}
+
+		Deletes every build directory and every compiled binary. Nothing is rebuilt.
+
+	\subsection{\tt make clean}
+
+		A _make purge_ followed by a _make all_: a full rebuild from scratch. This is the first thing to try if a build fails in a way that makes no sense (for example, a ``no such file or directory'' error referring to a _Makefile_), as these are almost always caused by a build directory left in a bad state by an interrupted configure step.
+\section{Useful for Developers}
+	\subsection{\tt make ship}
+
+		A ``clean-room'' release build: identical to _make all_, except that it always clones the external dependencies from github, rather than relying on local copies.
+
+	\subsection{\tt make debug}
+
+		An unoptimised build with debug symbols, written to \texttt{gdsims\_debug}. On GCC and Clang this build also switches on:
+
+		* AddressSanitizer and UndefinedBehaviourSanitizer, which halt the program with a full report at the first out-of-bounds access, use-after-free, signed overflow, \textit{etc.}
+		* Bounds-checked STL containers (so that, for example, an out-of-range _operator[]_ on a _std::vector_ is caught).
+
+		These make the debug build considerably slower than the release build, and so it should only be used to hunt bugs, never to produce results.
+
+	\subsection{\tt make profile}
+
+		An optimised build which retains debug symbols and frame pointers, written to \texttt{gdsims\_profile}. This is the build to use with a profiler, as it runs at (very nearly) the speed of the release build, but the profiler can still attribute time to individual functions and call stacks:
+
+		\begin{lstlisting}
+make profile
+perf record -g ./gdsims_profile
+perf report
+\end{lstlisting}
+
+	\subsection{\tt make test}
+
+		Builds the Catch2 unit-test suite (see [[unit tests]]) in debug mode, with the sanitizers active, and then runs every test through _ctest_. The output of any failing test is printed in full.
+
+	\subsection{\tt make mirror}
+
+		Runs the [[lsj]] mirror by hand, without building anything. This is rarely needed, as every build already runs the mirror before compiling (if _lsj_ is installed), but it is useful to check that the settings reflection is sound. The flags default to _-vf_, and can be changed via:
+
+		\begin{lstlisting}
+make mirror MIRROR_FLAGS=-q
+\end{lstlisting}
+
+
+\section{Passing flags to the build}
+
+	Additional flags can be passed through to the underlying build tool, the most common use being to compile in parallel:
+
+	\begin{lstlisting}
+make EXTRA_BUILD_FLAGS=-j8
+\end{lstlisting}

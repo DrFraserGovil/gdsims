@@ -1,0 +1,38 @@
+title: External Dependencies
+alias: dependencies
+-----------------
+
+
+To avoid re-inventing the wheel, we have used a small number of external libraries and tools.
+
+\section{Internal Libraries}
+
+	These are C++ libraries which are automatically downloaded by the [[Build System]] when the code is compiled: so long as you have a functioning internet connection and a modern (>3.15) version of cmake, these will be downloaded when needed.
+
+	\subsection{Catch2}
+		We use \href{https://github.com/catchorg/Catch2}{Catch2} for testing purposes; this is downloaded only when _make test_ is called.
+
+	\subsection{JSL}
+		JSL is the \href{https://github.com/DrFraserGovil/JSL}{Jack Standard Library}, it is a code library that I maintain.
+
+		Each version of GDSiMs is pegged to a specific version of JSL (currently 3.5.1) via a github link, which means that whenever someone attempts to compile the code, cmake compares the version of JSL it currently has (if any), and if a newer version is required, it pulls it from Github automatically.
+
+		So long as Github is live, this therefore requires no further interaction by the user, it just works!
+
+
+		\subsubsection{Local development copies}
+
+			For most individuals, JSL is a static library that they don't have to worry about, aside from perhaps consulting the documentation when extending GDSiMS.
+
+			However, as the maintainer of JSL, it is not unusual for me to find a bug, or decide an extension of JSL is necessary, in which case it would be cumbersome to have to go through the whole rigamarole of (update JSL)->(commit \& push)->(update CMakeLists)->(compile GDSiMS), especially when attempting a bugfix which may require dozens of such iterations.
+
+			The CMake is therefore configured to check for a *local copy* of JSL, and -- if it exists -- uses it in place of the GitHub version. The location is a CMake cache variable\footnote{The default value is the location on my work machine}, and so can be pointed elsewhere at configure time:
+
+			\begin{Code}
+				cmake --preset release -DLOCAL\_JSL=/path/to/JSL
+			\end{Code}
+
+			If no local copy is found, the pinned GitHub version is used, so this has no effect on a user's machine.
+\section{Optional Tools}
+
+	We use the [[LSJ]] tool to perform pre-compilation reflection

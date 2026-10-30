@@ -3,7 +3,7 @@
 #include <JSL.h>
 #include <stdexcept>
 #include <thread>
-using validation::Recorder;
+using Validation::Recorder;
 
 // Each section gets its own validateX function; add a call to it in querySettingsConstraints below.
 // For checks that depend on another section, pass the whole MainSettings instead of just the sub-struct.
@@ -35,7 +35,7 @@ namespace
 	}
 } // namespace
 
-void validation::Status::LogWarnings() const
+void Validation::Status::LogWarnings() const
 {
 	if (!Warnings.empty())
 	{
@@ -43,7 +43,7 @@ void validation::Status::LogWarnings() const
 	}
 }
 
-void validation::Status::LogErrors() const
+void Validation::Status::LogErrors() const
 {
 	if (!Errors.empty())
 	{
@@ -51,7 +51,7 @@ void validation::Status::LogErrors() const
 	}
 }
 
-void validation::Status::ThrowIfFatal() const
+void Validation::Status::ThrowIfFatal() const
 {
 	if (!Fatal.empty())
 	{
@@ -59,7 +59,7 @@ void validation::Status::ThrowIfFatal() const
 	}
 }
 
-void validation::Status::ThrowIfInvalid() const
+void Validation::Status::ThrowIfInvalid() const
 {
 	if (Valid())
 	{
@@ -75,7 +75,7 @@ void validation::Status::ThrowIfInvalid() const
 	throw std::invalid_argument(msg);
 }
 
-validation::Status querySettingsConstraints(const MainSettings &target)
+Validation::Status querySettingsConstraints(const MainSettings &target)
 {
 	Recorder record;
 

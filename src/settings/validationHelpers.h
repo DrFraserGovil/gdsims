@@ -7,7 +7,7 @@
 #include <vector>
 
 // Machinery for validate.cpp: lets each check be written as a single record.FailIf(...) line.
-namespace validation
+namespace Validation
 {
 	using QueuedMsg = std::vector<std::string>;
 
@@ -19,26 +19,26 @@ namespace validation
 		template <JSL::String::CanMakeFrom... Parts>
 		void FatalIf(bool condition, const Parts &...parts)
 		{
-			recordIf(Fatal, condition, parts...);
+			RecordIf(Fatal, condition, parts...);
 		}
 
 		// Records an error if the condition is true: a simulation cannot be launched until it is fixed.
 		template <JSL::String::CanMakeFrom... Parts>
 		void FailIf(bool condition, const Parts &...parts)
 		{
-			recordIf(Errors, condition, parts...);
+			RecordIf(Errors, condition, parts...);
 		}
 
 		// Records a warning if the condition is true: doesn't fail validation.
 		template <JSL::String::CanMakeFrom... Parts>
 		void WarnIf(bool condition, const Parts &...parts)
 		{
-			recordIf(Warnings, condition, parts...);
+			RecordIf(Warnings, condition, parts...);
 		}
 
 	  private:
 		template <JSL::String::CanMakeFrom... Parts>
-		static void recordIf(QueuedMsg &target, bool condition, const Parts &...parts)
+		static void RecordIf(QueuedMsg &target, bool condition, const Parts &...parts)
 		{
 			if (condition)
 			{
@@ -69,4 +69,4 @@ namespace validation
 		}
 		return os.str();
 	}
-} // namespace validation
+} // namespace Validation

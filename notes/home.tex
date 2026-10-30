@@ -1,0 +1,38 @@
+title: GDSiMS 2.0
+alias: home
+------------------
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=blue,
+}
+---------------------------
+
+The GDSiMS 2.0 project is an attempt to rebuild the \href{https://github.com/AceRNorth/gdsims}{original GDSiMS} from the ground up, improving both the efficiency of the code, and improving and extending it's functionality. For the moment, \textbf{we accept that this will break compatibility with the \href{https://github.com/AceRNorth/gdsims-gui/}{GUI Interface}} - this interface will continue to work with the original version of the code, and subsequent updates may bring them back in line. For now, this will remain a terminal-only product.
+
+The main advancement in the development of this project will be converting GDSiMS from a single concept, into a *suite* of libraries with a separation of concerns between different components.
+
+The main components of this new GDSiMS are:
+
+\begin{tabularx}{\linewidth}{|l|X|}
+	\hline
+	\bf Component           & \bf Description
+	\\\hline
+	[[App Interface]]       & The user interface \& systems for converting command line and config-file input into internal data.
+	\\
+	[[Environment Library]] & The core definitions of a simulation environment
+	\\
+	[[Mapping Library]]     & Converts input geographical data into a valid mesh
+	\\
+	[[Simulation Library]]  & Runs Gene Drive simulations on a given environment
+	\\ \hline
+	[[Build System]]        & A robust and easy-to-use system for compiling the source code into a working binary on most modern systems.
+	\\
+	[[Developer Resources]] & Some tools, unit tests and guidelines for future developers on this project.
+	\\
+	\hline
+\end{tabularx}
+
+

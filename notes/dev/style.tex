@@ -1,0 +1,146 @@
+title: Style Guide
+alias: style
+---------------------
+\usepackage{listings}
+\lstset{language=C++,basicstyle=\small\ttfamily,keywordstyle=\color{blue}\ttfamily,commentstyle=\color{green!40!black}\ttfamily,backgroundcolor=\color{black!10!white},columns=fullflexible,tabsize=4,showstringspaces=false}
+\usepackage{hyperref}
+\hypersetup{
+	colorlinks=true,
+	linkcolor=blue,
+	filecolor=magenta,
+	urlcolor=blue,
+}
+---------------------
+
+These guidelines describe how the GDSiMS code is written, so that new code reads like the code around it. Most of the layout is enforced automatically by _clang-format_ (see the end of this note); the rest is convention.
+
+\section{Formatting}
+
+	* Allman-style braces
+	** Opening braces go on their own line matching the indentation of the opening control statement.
+	** Closing braces go on their own line matching the indentation of the opening brace
+	** Code inside the braces is indented
+	** Opening/closing braces should be the only characters on their line (except comments). No `cuddled elses'.
+	** The exception is lambdas, which stay on the same line (for short lambdas), or use K\&R braces (for long lambdas)
+	\begin{lstlisting}
+	// good 
+	if (a)
+	{
+		auto shortLambda = [&](int i){return 2*i;};
+	}
+	else
+	{
+		auto longLambda = [&](int i){
+			//code
+		};
+	}
+	\end{lstlisting}
+	** An exception is permitted for exceptionally short control statements, which may be on a single line:
+	\begin{lstlisting}
+	// allowed (but rarely)
+	if (a) {return b;}
+	// or
+	struct A
+	{
+		int B;
+		bool Valid() {return B == 0;}
+	};
+	\end{lstlisting}
+	* Always use braces on control statements, even around a single line: _if(a) return b;_ is considered invalid.
+	* Indent with tabs (displayed four wide), never spaces.
+	* The contents of a namespace are indented, and its closing brace is labelled: _\} // namespace Validation_.
+	* Access specifiers (_public:_, _private:_) sit half an indent in from the class.
+	* There is no enforced line-length limit: a long statement or comment stays on one line, rather than being wrapped by hand.
+
+\section{Naming}
+
+	* The case used is informative of the type and scope of the object being named:
+	\begin{enumerate}
+		\item \textbf{PascalCase} is used for:
+		      \begin{itemize}
+			      * Types (classes, structs enums)
+			      * Global names (global variables, enum values)
+			      * Class members (variables and functions)
+			      * Namespaces
+		      \end{itemize}
+		\item \textbf{camelCase} is used for:
+		      \begin{itemize}
+			      * Local variables (or those at an isolated file-scope in a .cpp)
+			      * free functions
+		      \end{itemize}
+		\item \textbf{SCREAMING\_SNAKE\_CASE} is used for:
+		      \begin{itemize}
+			      * Preprocessor macros
+		      \end{itemize}
+	\end{enumerate}
+	* Names are descriptive words
+	** Abbreviations are to be avoided except where obvious (_cmdA_ for _commandA_ is acceptable, for instance, but _qSetCon_ for _querySettingsConstraints_ would not be)
+	** Short names (_i_, _j_, _n_) are fine for a short-lived local values, such as a loop index
+	** Most function names normally start with a verb, saying what they do: _readConfiguration_, _printVersion_, _deriveSettingsValues_.
+	** A function returning _bool_ may also be named so it reads gramatically in an if statement: _if(requestsHelp())_, _if(Valid())_.
+	* British spellings are preferred, but exceptions are allowed for consistency with common command-words (_color_ and _center_), for example, though note that JSL uses 'Colour'.
+	* The \texttt{\&} and \texttt{\char42} attach to the name, not the type: \texttt{char \char42\char42argv}, \texttt{const Parts \&...parts}.
+
+\section{Files and includes}
+
+	* Headers begin with _\#pragma once_, rather than include guards.
+	* GDSiMS headers are included in quotes, with their path from _src/_ (_"settings/validate.h"_); everything else uses angle brackets.
+	* Include only what is used: prefer a specific JSL header (_<JSL/Log.h>_) to the whole library (_<JSL.h>_) where it is easy to do so.
+	* Helpers used by a single _.cpp_ file go in an anonymous namespace at the top of that file, not in the header, and not as _static_ functions.
+
+\section{Comments and documentation}
+
+	* We use doxygen comment styles (_//!_ and \texttt{/*! (...) */}), and require everything declared in a header file to be fully documented
+
+	\begin{lstlisting}
+//! @brief Collects a status object for the provided settings, but does not throw or print anything
+//! @param target a full-suite settings object to be queried
+//! @returns A status object detailing any fatal errors, errors or warnings
+Validation::Status querySettingsConstraints(const MainSettings &target);
+\end{lstlisting}
+	* Comments inside an implementation use plain _//_
+	* Internal comments are full sentences, and should generally explain *why* the code does what it does, not *what* it does.
+	* Structured comments are highly encouraged\par
+	\begin{tabularx}{\linewidth}{lX}
+		\bf Syntax               & \bf Usage
+		\\
+		_// TODO:_               & Unfinished work \& required features
+		\\
+		_// INFO:_ and _//NOTE:_ & Long information blocks
+		\\
+		_// HACK:_               & A block of code which works, but is `hacky' and needs replacing
+		\\
+		_// PERF:_               & A block of code which works, but needs optimising, or is suspected to dominate the runtime.
+		\\
+		_// WARN:_               & A warning to future developers
+		\\
+		_// BUG:_ and _//ISSUE:_ & A part of code which is known to be flawed and needs fixing
+	\end{tabularx}
+	Common editor plugins (\href{https://github.com/folke/todo-comments.nvim}{like the one I use}) add syntax highlighting and search features keying off these values, so it makes navigating and browsing the code much easier.
+	* A long function may be broken into labelled parts with a section comment: _// ---------- PARALLEL ---------_.
+
+
+\section{Language use}
+
+	* The code targets C++20, and uses it freely: concepts to constrain templates, designated initialisers, fold expressions, _std::string\_view_ for read-only strings.
+	* _std::format_ is avoided, as it is unreliable on Apple Clang; strings are built with streams, or with JSL's _makeFrom_.
+	* _const_ wherever possible: on local variables which do not change, on member functions which do not modify their object, and on parameters passed by reference.
+	* Where appropriate, it is prefered to pass non-primitive values by (const) reference.
+	* _auto_ is used where the type is obvious or unimportant (_const auto \&cmds = Settings.Commands;_), and avoided where spelling the type out tells the reader something.
+	* Loops prefer the range-based form; where an index is needed, use _size\_t_ and pre-increment (_++e_).
+	* Enumerations are always _enum class_.
+	* A _switch_ on an enumeration lists every value explicitly, and never has a _default_ case: this way the compiler warns about every _switch_ which needs updating when a new value is added. Each case with its own variables gets its own braces.
+	* Raw _new_ and _delete_ are \textbf{never} used; ownership is held by standard containers or smart pointers.
+	* Copy and assignment are explicitly deleted (_= delete_) for classes which must not be copied, such as RAII guards.
+
+\section{Global state}
+
+	The only global is the global settings object. It is read everywhere through the _const_ reference _Settings_, and only ever written through _ChangeSettings()_, which should appear only in start-up code and on direct user instruction. New code should not add further globals: pass what a function needs as an argument.
+
+\section{Errors and output}
+
+	* A problem the program cannot recover from is reported by throwing a standard exception (_std::invalid\_argument_, _std::runtime\_error_, _std::logic\_error_ for ``this should be impossible''). Exceptions are caught in _main_, or in the menu loop, and nowhere else unless there is something useful to do with them.
+	* Code which is not yet written throws _std::logic\_error_ saying so, rather than silently doing nothing.
+	* Diagnostics use JSL's _LOG(level)_ macro, at a level which reflects their importance (_DEBUG_, _INFO_, _WARN_, _ERROR_). The log headers (enabled with _-v_) record where each message came from, so it is fine to _LOG(ERROR)_ the detail of a problem immediately before throwing.
+	* Output which the user explicitly asked for (the version number, a menu prompt, a help list) goes straight to _std::cout_, never through _LOG_, so that _-q_ or _-s_ cannot hide it.
+	* The final fatal message goes to _std::cerr_, unformatted, so that it is still seen when the normal output is redirected.

@@ -1,0 +1,33 @@
+title: Versioning and Changes
+alias: version, changelog
+------------------------------
+\usepackage{hyperref}
+\hypersetup{colorlinks=true,linkcolor=blue,urlcolor=blue}
+------------------------------
+
+GDSiMS has a single source of truth for its version number: the file _VERSION_ in the repository root, which contains nothing but the version itself (for example _0.1.0_). Nothing else in the repository should ever contain a hard-coded version number.
+
+
+
+\section{Version numbers}
+
+	The version follows \href{https://semver.org/}{semantic versioning}, MAJOR.MINOR.PATCH:
+
+	* PATCH: bug fixes, which do not change any results which were correct before.
+	* MINOR: new features, which leave every existing configuration working as before.
+	* MAJOR: changes which break existing configuration files, mesh files, or (importantly for a scientific code) which change the results of an existing configuration.
+
+	The final point means that a change to the model itself (a new term in the dynamics, a change to how random numbers are drawn) is a major change even if no interface has changed, as anybody wishing to reproduce a published result needs to know which versions are comparable.
+
+	\subsection{How the version reaches the code}
+
+		At configure time, CMake reads _VERSION_, uses it as the project version, and generates a small header (_version.h_, placed in the build directory rather than in _src/_) from the template _src/version.h.in_. The header exposes the full version string and its three components as compile-time constants, so that any part of the code can simply include it.
+\section{The changelog}
+
+	Every change visible to a user is recorded in _CHANGELOG.md_, in the \href{https://keepachangelog.com/}{Keep a Changelog} format. Changes are added to the _Unreleased_ section at the top as they are made, under the headings Added, Changed, Deprecated, Removed, Fixed and Security.
+
+	To make a release:
+
+	* Bump the number in _VERSION_.
+	* Rename the _Unreleased_ heading to the new version and the date, and start a new, empty _Unreleased_ section above it.
+	* Commit both together, and tag the commit with the version number.

@@ -1,4 +1,5 @@
 title: LSJ Mirror
+
 alias: lsj
 ------------------
 \usepackage{graphicx}
@@ -20,7 +21,7 @@ alias: lsj
 }
 ===================
 
-The \href{https://github.com/DrFraserGovil/LSJ}{lsj} tool is an external reflection-and-documentation tool used for tools which use the [[JSL]] _Interface::Aggregator_ module.
+The \href{https://github.com/DrFraserGovil/LSJ}{lsj} tool is an external reflection-and-documentation tool used for objects which use the  _JSL::Interface::Aggregator_ module.
 
 \section{Motivation}
 	The _Aggregator_ module is designed to minimise the code duplication required to maintain a large set of settings which need to be able to be configured by user input at runtime.
@@ -139,4 +140,10 @@ class Settings : JSL::Interface::Aggregator<Settings>
 
 	This is all generated automatically, without the user having to do anything, aside from add some useful comments to their code.
 
+\section{In the GDSiMS build}
 
+	The mirror runs automatically as part of every build (whether from _make_ or from an IDE), immediately before the library is compiled, so the _.autogen_ files never fall out of date with the settings headers they describe. The flags it is called with are a CMake cache variable (_-fq_ by default; the [[make options|ship]] build uses _-vf_).
+
+	The _.autogen_ files are committed to the repository. A user without _lsj_ installed therefore still gets a working build: CMake notes that the tool is missing, and the cached files are used as they are. Only a developer changing the settings classes needs _lsj_, and they must remember to commit the regenerated files alongside their change.
+
+	The settings classes which make use of this live in _src/settings/_, and are described in [[settings]].

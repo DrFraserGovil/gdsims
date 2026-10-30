@@ -1,0 +1,38 @@
+title: Carrying Capacity
+alias: capacity, alpha
+todo:
+------------------------------------
+
+
+The carrying capacity $\alpha$ of a node is a measure of how many larvae it can support: loosely, ``how many mosquitoes could live here, if there were no other interactions''. It enters the larval survival through the density-dependent competition term
+\begin{equation}
+	\mathrm{comp} = (1 - \mu_j) \left( \frac{\alpha}{\alpha + J} \right)^{p}
+\end{equation}
+where $J$ is the total number of larvae in the node, $\mu_j$ is the density-independent larval mortality, and $p$ is a fixed power ($1/15$ by default). In the original code, this is the only place in which one node differs from another.
+%
+% \section{Structure}
+%
+% 	The capacity has a constant part, which reflects the node's permanent breeding sites (water containers and so on), and a part which follows the rainfall:
+% 	\begin{equation}
+% 		\alpha_i(t) = \alpha^{(0)}_i + \alpha^{(1)}_{g_1(i)} \, G_{g_2(i)}(t)
+% 	\end{equation}
+% 	where:
+%
+% 	* $\alpha^{(0)}_i$ is the baseline capacity of node $i$.
+% 	* $\alpha^{(1)}_g$ is the sensitivity to rainfall of the nodes in group $g$.
+% 	* $G_g(t)$ is the rainfall series of group $g$, as a function of the day $t$.
+% 	* $g_1(i)$ and $g_2(i)$ are the groups node $i$ belongs to, for sensitivity and for rainfall respectively.
+%
+% 	All of the parts are [[mesh|node fields]], and are cached in the [[environment]]. Precomputing $\alpha_i(t)$ for every node and every day would make a table of size (nodes $\times$ days), which is far too large for a high-resolution mesh. It is instead assembled as it is needed, from a few small tables: two of one value per node, and one of size (rainfall groups $\times$ days). The rainfall table is stored day-by-day, so that all the values needed on a given day sit together in memory.
+%
+% \section{The baseline}
+%
+% 	In the original code, each node's $\alpha^{(0)}$ was drawn independently from a lognormal distribution. This variation between nodes is kept: each group has the mean and variance of a lognormal distribution, and each node's baseline is drawn from its group's distribution once, when the environment is built. The drawn values are stored per node, so they cost nothing during the simulation, and storing them in the environment also means that two runs from the same environment see the same landscape.
+%
+% 	Urban and rural nodes are distinguished in the same way as in the original code, through their $\alpha^{(0)}$ groups (with rural nodes having a lower baseline, reflecting fewer breeding sites), and through the [[conformal]] connectivity $u$.
+%
+% \section{Capacity, not density}
+%
+% 	The capacity is a property of the node as a whole, not a density: there is no notion of a node's area, and the original code did not have one either. This is consistent with each node representing a block of settlement, whose capacity comes from the data (for example, summed over the map cell).
+%
+% 	It does mean that the capacity must be rescaled if the same landscape is described at a different resolution, since a coarse node covers what a fine mesh splits between several. Building the capacities from data per cell takes care of this automatically.

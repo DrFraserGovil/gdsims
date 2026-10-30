@@ -1,0 +1,33 @@
+title: Validation
+alias: validation, validate
+todo:
+------------------------------
+\usepackage{listings}
+\lstset{language=C++,basicstyle=\small\ttfamily,backgroundcolor=\color{black!10!white},columns=fullflexible,tabsize=4}
+------------------------------
+
+The [[settings]] parser guarantees that every value has the right *type* (a thread count is an integer, a file is a path), but not that the values make *sense*: a thread count of zero is a perfectly good integer. Validation is the step which checks the settings against each other and against the machine, before anything is run.
+
+\section{Severities}
+
+	Each problem found is given one of three severities:
+
+	* \textbf{Fatal}: the program cannot do anything useful at all, and nothing the user does from within the program could fix it. For example, interactive mode was requested, but the input is piped from a file.
+	* \textbf{Error}: the settings are wrong, and no simulation can be run with them, but they could be fixed from the [[interactive menu]]. For example, more threads are requested than the machine has.
+	* \textbf{Warning}: the settings are usable, but probably not what the user meant. For example, both quiet and verbose mode were requested.
+
+	The distinction between the first two only matters in interactive mode: a normal run halts on either, while the menu only halts on a fatal problem.
+
+
+\section{Adding a check}
+
+	The validation process is wrapped by a _Recorder_ object which collates all encountered warnings and errors (it does not throw on the first issue encountered, so all issues are identified at once).
+
+	For ease of maintainability, the checks are grouped together in _src/settings/validate.cpp_. Each check is a single line, stating the condition which constitutes the problem, and the message to give:
+
+	\begin{lstlisting}[showstringspaces=false]
+record.FailIf(s.ParallelThreads == 0, "ParallelThreads must be at least 1");
+record.WarnIf(s.Quiet && s.Verbose, "Both Quiet and Verbose are set");
+\end{lstlisting}
+
+

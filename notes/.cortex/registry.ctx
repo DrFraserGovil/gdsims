@@ -3,3 +3,21 @@ name = GDSiMS V2.0
 % The sidebar shown on every page of the viewer: one entry per line after "sidebar:", each a note's title or alias
 % (optionally "target|Label"). A line "[Heading]" starts a new group. Notes can add their own with a sidebar: header line.
 sidebar:
+[Building]
+Build System
+Make Options
+Unit Tests
+Versioning
+JSL
+LSJ Mirror
+[Using GDSiMS]
+Commands and Modes
+Interactive Mode
+Settings
+Validation
+[Mesh & Environment]
+Mesh
+Conformal Mesh
+Carrying Capacity
+Environment
+Original Mesh

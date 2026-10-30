@@ -1,0 +1,52 @@
+title: Conformal Mesh
+alias: conformal, effective distance
+todo:
+------------------------------------
+
+We approximate that the mesh sits on a flat two-dimensional *chart*: each node has a position $\vec{x}_i$, and the chart distance between two nodes is the ordinary Euclidean distance $d_{ij} = |\vec{x}_i - \vec{x}_j|$. The chart distance alone, however, treats every kilometre as equal, whereas a mosquito crossing a kilometre of continuous settlement (with houses, water containers and blood meals all the way) faces a very different journey to one crossing a kilometre of open fields between two villages.
+
+Rather than add a new kind of object to the [[mesh]] to represent the land between villages, we absorb this into the distance itself, by giving the chart a *conformal* metric:
+\begin{equation}
+	{\rm d}s = e^{u(\vec{x})} |{\rm d}\vec{x}|
+\end{equation}
+where $u(\vec{x}) \geq 0$ is a dimensionless measure of how hard it is to travel through the space around $\vec{x}$. Where $u = 0$, distances are their chart values; where $u > 0$, they are stretched. A conformal metric changes lengths but not angles, and so it is the simplest modification which leaves the local geometry (``which neighbour is to the north'') untouched.
+
+\section{The node approximation}
+
+	We know $u$ only at the nodes, $u_i = u(\vec{x}_i)$, as a per-node [[mesh|NodeField]]. Assuming the path between two nodes is a straight line in the chart, along which $u$ varies slowly, the effective distance is the integral of the metric along it, which we approximate by the geometric mean of the conformal factors at the two ends:
+	\begin{equation}
+		d^{\rm eff}_{ij} = \int_{\vec{x}_i}^{\vec{x}_j} e^{u} \, |{\rm d}\vec{x}| \approx d_{ij} \exp\left(\frac{u_i + u_j}{2}\right)
+	\end{equation}
+	This has the properties we need:
+
+	* It is symmetric, $d^{\rm eff}_{ij} = d^{\rm eff}_{ji}$.
+	* It reduces to the chart distance between two urban nodes ($u_i = u_j = 0$).
+	* It depends only on per-node quantities, so it needs no extra data beyond what the mesh already holds.
+
+	As an example, with urban nodes assigned $u = 0$ and rural nodes $u = 1$, two neighbouring nodes a distance $d$ apart are effectively $d$ apart if both are urban, $e^{1/2}d \approx 1.65d$ if one is rural, and $e\,d \approx 2.72d$ if both are rural.
+
+\section{How good is the approximation?}
+
+	If $u$ varies linearly along the path, from $u_i$ to $u_j$, the integral can be done exactly:
+	\begin{equation}
+		\frac{d^{\rm eff, exact}_{ij}}{d^{\rm eff, approx}_{ij}} = \frac{\sinh(\Delta / 2)}{\Delta / 2}, \qquad \Delta = u_j - u_i
+	\end{equation}
+	which is always at least one, so the approximation slightly underestimates the distance. The error is small for moderate contrasts: about $4\%$ for $\Delta = 1$ (urban to rural, in the example above), and about $18\%$ for $\Delta = 2$.
+
+	There is a second, opposing, error: the shortest path in a conformal metric is not the straight line, but bends around regions of high $u$ (a mosquito may prefer to follow a ribbon of settlement, rather than cross the fields directly). The straight line therefore overestimates the true effective distance. For a mesh with a fine resolution compared to the scale on which $u$ varies, both errors are small.
+
+\section{Use in the code}
+
+	The effective distance is computed in exactly one place, a single function of two node indices, which is called only when the [[environment]] is built: the dispersal probabilities between every connected pair of nodes are then calculated once from it, and cached. The rest of the code never sees a distance at all, only the cached probabilities, and so the cost of the metric (however elaborate) is paid only once.
+
+	This also means the approximation above can be improved later, without any other change to the code. Possible refinements are:
+
+	* A true line integral along the path, using a $u$ field sampled more finely than the nodes (for example, from a land-cover map).
+	* Treating some regions as having very large $u$.
+
+	The latter would be the natural way to represent barriers such as open water. However, whether water really is a barrier is an open question, since mosquitoes also travel by hitching a ride on human transport (boats crossing Lake Victoria, for example). Human-mediated movement is therefore planned as a separate set of edges (see [[mesh]]) which does not use this metric at all: water is never simply assumed to be impassable.
+
+\section{Open questions}
+
+	* How should $u$ be assigned in practice? From settlement density, from land cover, or simply from the urban/rural classification of the source data?
+	* Should the dispersal kernel be applied to $d^{\rm eff}$ in the same functional form as it is to the chart distance, or does stretching the distance also change the shape of the kernel?
